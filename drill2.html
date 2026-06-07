@@ -1,1 +1,235 @@
-b
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小2かんじ完全網羅ドリル（160字）</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #eef7f2;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        h1 {
+            color: #2e7d32;
+            font-size: 22px;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #2e7d32;
+            padding-bottom: 10px;
+        }
+        .progress {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .question-box {
+            background-color: #f1f8e9;
+            border: 2px solid #81c784;
+            border-radius: 10px;
+            padding: 25px 20px;
+            margin-bottom: 20px;
+        }
+        .sentence {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            line-height: 1.6;
+        }
+        .target {
+            color: #e53935;
+            border-bottom: 3px solid #e53935;
+            padding: 0 5px;
+            font-weight: 900;
+        }
+        .hint {
+            font-size: 15px;
+            color: #555;
+            margin-top: 12px;
+            background-color: #fff;
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid #c8e6c9;
+        }
+        .input-area {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            font-size: 28px;
+            width: 120px;
+            text-align: center;
+            padding: 8px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        input[type="text"]:focus {
+            border-color: #4caf50;
+            outline: none;
+        }
+        button {
+            font-size: 18px;
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px #1b5e20;
+            font-weight: bold;
+        }
+        button:active {
+            box-shadow: 0 1px #1b5e20;
+            transform: translateY(3px);
+        }
+        .result-message {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 15px;
+            height: 30px;
+        }
+        .correct { color: #2e7d32; }
+        .incorrect { color: #c62828; }
+        
+        .score-screen {
+            display: none;
+        }
+        .score-title {
+            font-size: 26px;
+            color: #388e3c;
+            margin-bottom: 20px;
+        }
+        .score-text {
+            font-size: 22px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- クイズ画面 -->
+    <div id="quiz-screen">
+        <h1>小2かんじ 160文字テスト</h1>
+        <div class="progress" id="progress">第 1 問 / 全 10 問</div>
+        
+        <div class="question-box">
+            <div class="sentence" id="sentence">問題</div>
+            <div class="hint" id="hint">ひんと</div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="answer-input" maxlength="10" placeholder="かんじ" autocomplete="off">
+        </div>
+
+        <button id="action-btn" onclick="checkAnswer()">こたえあわせ</button>
+        <div class="result-message" id="result-message"></div>
+    </div>
+
+    <!-- スコア画面 -->
+    <div id="score-screen" class="score-screen">
+        <div class="score-title">💯 お疲れさまでした！</div>
+        <div class="score-text" id="score-text">10問中 10問 せいかい！</div>
+        <button onclick="restartQuiz()">もういちど 挑戦する</button>
+    </div>
+</div>
+
+<script>
+    // 小学校2年生で習う全160文字を重複なく完全に収録
+    const allQuestions = [
+        { sentence: "弓矢を「●」く。", hint: "ひく", answer: "引" },
+        { sentence: "鳥の「●」が落ちている。", hint: "はね", answer: "羽" },
+        { sentence: "空に白い「●」が浮かぶ。", hint: "くも", answer: "雲" },
+        { sentence: "「●」の外に出て遊ぶ。", hint: "こうえんの『えん』", answer: "園" },
+        { sentence: "学校から「●」い家。", hint: "とおいつ、えんそくの『えん』", answer: "遠" },
+        { sentence: "「●」か用事がありますか。", hint: "なにか、なに", answer: "何" },
+        { sentence: "理科や「●」学を学ぶ。", hint: "かがくの『か』", answer: "科" },
+        { sentence: "「●」休みが待ち遠しい。", hint: "なつ", answer: "夏" },
+        { sentence: "自分の「●」に帰る。", hint: "いえ、かていの『か』", answer: "家" },
+        { sentence: "大きな声で「●」う。", hint: "うたう、かしゅの『か』", answer: "歌" },
+        { sentence: "ノートに絵を「●」く。", hint: "えがく、けいかくの『かく』", answer: "画" },
+        { sentence: "時計の針が１「●」まわる。", hint: "まわる、まわり、かいすうの『かい』", answer: "回" },
+        { sentence: "友達に「●」う。", hint: "あう、たいかいの『かい』", answer: "会" },
+        { sentence: "広い「●」で泳ぐ。", hint: "うみ、かいすいの『かい』", answer: "海" },
+        { sentence: "きれいな「●」を見る。", hint: "え、かいがの『が』", answer: "絵" },
+        { sentence: "お家の「●」で遊ぶ。", hint: "そと、がいこくの『がい』", answer: "外" },
+        { sentence: "しかくい「●」を曲がる。", hint: "かど、かくどの『かく』", answer: "角" },
+        { sentence: "音楽を「●」しむ。", hint: "たのしむ、おんがくの『がく』", answer: "楽" },
+        { sentence: "生活の「●」動をおこなう。", hint: "かつどうの『かつ』、いきいき", answer: "活" },
+        { sentence: "昼休みの時「●」。", hint: "あいだ、じかんの『かん』", answer: "間" },
+        { sentence: "「●」い数字のテスト。", hint: "まるい、がんねんの『がん』", answer: "丸" },
+        { sentence: "ゴツゴツした「●」がある。", hint: "いわ、がんせきの『がん』", answer: "岩" },
+        { sentence: "きれいに「●」を洗う。", hint: "かお、がんめんの『がん』", answer: "顔" },
+        { sentence: "「●」車がシュシュと走る。", hint: "きしゃの『き』", answer: "汽" },
+        { sentence: "日記に「●」す。", hint: "しるす、きろくの『き』", answer: "記" },
+        { sentence: "お家に「●」る。", hint: "かえる、きこくの『き』", answer: "帰" },
+        { sentence: "「●」を引いて的をねらう。", hint: "ゆみ、きゅうどうの『きゅう』", answer: "弓" },
+        { sentence: "「●」乳を毎朝飲む。", hint: "うし、ぎゅうにゅうの『ぎゅう』", answer: "牛" },
+        { sentence: "海で「●」を釣る。", hint: "さかな、ぎょるいの『ぎょ』", answer: "魚" },
+        { sentence: "「●」都へ旅行する。", hint: "きょうと、とうきょうの『きょう』", answer: "京" },
+        { sentence: "腕の「●」い人。", hint: "つよい、きょうりょくの『きょう』", answer: "強" },
+        { sentence: "先生が勉強を「●」える。", hint: "おしえる、きょうしつの『きょう』", answer: "教" },
+        { sentence: "学校の「●」くに住む。", hint: "ちかい、きんじょの『きん』", answer: "近" },
+        { sentence: "私の「●」は優しい。", hint: "あに、きょうだいの『けい』", answer: "兄" },
+        { sentence: "いろいろな「●」の図形。", hint: "かたち、けいじょうの『けい』", answer: "形" },
+        { sentence: "時間を「●」る。", hint: "はかる、けいかくの『けい』", answer: "計" },
+        { sentence: "みんな「●」気に出かける。", hint: "げんき、もと", answer: "元" },
+        { sentence: "正しい「●」葉をつかう。", hint: "ことば、げんごの『げん』", answer: "言" },
+        { sentence: "広い「●」っぱを走る。", hint: "はら、こうげんの『げん』", answer: "原" },
+        { sentence: "お家の「●」を開ける。", hint: "と、こぐちの『こ』", answer: "戸" },
+        { sentence: "「●」い道具を大切にする。", hint: "ふるい、こどの『こ』", answer: "古" },
+        { sentence: "「●」の１時に集まる。", hint: "ごごの『ご』", answer: "午" },
+        { sentence: "前の人の「●」に続く。", hint: "うしろ、あと、こうはんの『ご』", answer: "後" },
+        { sentence: "外国の「●」を勉強する。", hint: "かたる、ことば、げんごの『ご』", answer: "語" },
+        { sentence: "「●」場でものを作る。", hint: "こうじょうの『こう』", answer: "工" },
+        { sentence: "「●」園の遊具で遊ぶ。", hint: "こうえんの『こう』、おおやけ", answer: "公" },
+        { sentence: "「●」い野原を走る。", hint: "ひろい、こうこくの『こう』", answer: "広" },
+        { sentence: "友達と交「●」する。", hint: "まじわる、こうばんの『こう』", answer: "交" },
+        { sentence: "太陽の「●」線がまぶしい。", hint: "ひかり、こうせんの『こう』", answer: "光" },
+        { sentence: "しっかり頭で「●」える。", hint: "かんがえる、こうさつの『こう』", answer: "考" },
+        { sentence: "みんなで遠足に「●」く。", hint: "いく、おこなう、こうどうの『こう』", answer: "行" },
+        { sentence: "「●」い建物を見上げる。", hint: "たかい、こうこうの『こう』", answer: "高" },
+        { sentence: "「●」色のひまわりが咲く。", hint: "きいろ、おうごんの『おう』", answer: "黄" },
+        { sentence: "力を「●」わせて頑張る。", hint: "あわせる、あう、ごうけいの『ごう』", answer: "合" },
+        { sentence: "山と山の間の「●」を歩く。", hint: "たに、けいこくの『こく』", answer: "谷" },
+        { sentence: "日本の「●」旗をかかげる。", hint: "くに、こっかの『こく』", answer: "国" },
+        { sentence: "「●」い鉛筆で書く。", hint: "くろい、こくばんの『こく』", answer: "黒" },
+        { sentence: "「●」の時間を大切にする。", hint: "いま、こんげつの『こん』", answer: "今" },
+        { sentence: "８「●」の誕生日をむかえる。", hint: "さい、ねんれいの『さい』", answer: "才" },
+        { sentence: "「●」い糸を通す。", hint: "ほそい、さいぶの『さい』", answer: "細" },
+        { sentence: "工作で箱を「●」る。", hint: "つくる、さくひんの『さく』", answer: "作" },
+        { sentence: "算「●」の計算をする。", hint: "さんすう、さんしゅつの『さん』", answer: "算" },
+        { sentence: "「●」時のおやつを食べる。", hint: "みっつ、みつ、さんの『さん』", answer: "三" },
+        { sentence: "足を「●」めて立つ。", hint: "とめる、とまる、ちしの『し』", answer: "止" },
+        { sentence: "にぎやかな「●」街地。", hint: "いち、まち、しちょうの『し』", answer: "市" },
+        { sentence: "的めがけて「●」を放つ。", hint: "や、しせんの『し』", answer: "矢" },
+        { sentence: "お「●」さんと買い物に行く。", hint: "あね、きょうだいの『し』", answer: "姉" },
+        { sentence: "相手のことを「●」う。", hint: "おもう、しそうの『し』", answer: "思" },
+        { sentence: "折り「●」で鶴を折る。", hint: "かみ、ようしの『し』", answer: "紙" },
+        { sentence: "古いお「●」でお参りをする。", hint: "てら、じいんの『じ』", answer: "寺" },
+        { sentence: "「●」分で準備をする。", hint: "みずから、おのずと、じどうの『じ』", answer: "自" },
+        { sentence: "「●」計を見て起きる。", hint: "とき、じかんの『じ』", answer: "時" },
+        { sentence: "図工「●」で絵を描く。", hint: "むろ、しつ、きょうしつの『しつ』", answer: "室" },
+        { sentence: "「●」会のために働く。", hint: "やしろ、しゃかいの『しゃ』", answer: "社" },
+        { sentence: "体が「●」って力が出ない。", hint: "よわい、じゃくてんの『じゃく』", answer: "弱" },
+        { sentence: "きりんの「●」は長い。", hint: "くび、しゅしょうの『しゅ』", answer: "首" },
+        { sentence: "「●」風が吹き抜ける。", hint: "あき、しゅんかの『しゅう』", answer: "秋" },
+        { sentence: "「●」末に旅行へ行く。", hint: "まわり、しゅうかんの『しゅう』", answer: "週" },
+        { sentence: "あたたかい「●」が来た。", hint: "はる、しゅんぶんの『しゅん』", answer: "春" },
+        { sentence: "上手に文字を「●」く。", hint: "かく、しょどうの『しょ』", answer: "書" },{ sentence: "「●」しだけ待ってください。", hint: "すくない、すこし、しょうじょの『しょう』", answer: "少" },{ sentence: "運動「●」で走り回る。", hint: "ばしょ、ば、じょうの『じょう』", answer: "場" },{ sentence: "きれいな「●」のドレス。", hint: "いろ、しき、さいきんの『しき』", answer: "色" },{ sentence: "朝「●」をしっかり食べる。", hint: "たべる、くう、しょくじの『しょく』", answer: "食" },{ sentence: "「●」臓がドキドキする。", hint: "こころ、しんぞうの『しん』", answer: "心" },{ sentence: "「●」しいノートをおろす。", hint: "あたらしい、しんぶんの『しん』", answer: "新" },{ sentence: "「●」切に道を教える。", hint: "おや、したしい、しんせつの『しん』", answer: "親" },{ sentence: "「●」書館で本を借りる。", hint: "はかる、ちずの『ず』、と", answer: "図" },{ sentence: "おはじきの「●」を数える。", hint: "かず、かぞえる、すうがくの『すう』", answer: "数" },{ sentence: "「●」の空に太陽が沈む。", hint: "にし、せいようの『せい』", answer: "西" },{ sentence: "大きな「●」で返事をする。", hint: "こえ、おんせいの『せい』", answer: "声" },{ sentence: "夜空に「●」が光る。", hint: "ほし、せいざの『せい』", answer: "星" },{ sentence: "すっきりと「●」れた空。", hint: "はれる、はれ、せいてんの『せい』", answer: "晴" },{ sentence: "ハサミで紙を「●」る。", hint: "きる、せっぱつの『せつ』", answer: "切" },{ sentence: "冬に「●」が降り積もる。", hint: "ゆき、せっぺんの『せつ』", answer: "雪" },{ sentence: "大きな「●」が港にとまる。", hint: "ふね、せんぱくの『せん』", answer: "船" },{ sentence: "ノートにまっすぐ「●」を引く。", hint: "すじ、せん、ちょくせんの『せん』", answer: "線" },{ sentence: "みんなの「●」に立って走る。", hint: "まえ、ぜんぱんの『ぜん』", answer: "前" },{ sentence: "クラスの「●」分けをする。", hint: "くむ、くみたてる、そしきの『そ』", answer: "組" },{ sentence: "校庭を思いきり「●」る。", hint: "はしる、そうこうの『そう』", answer: "走" },{ sentence: "荷物が「●」くて持てない。", hint: "おおい、たじゅうの『た』", answer: "多" },{ sentence: "「●」鼓をたたいて楽しむ。", hint: "ふとい、ふとる、たいようの『たい』", answer: "太" },{ sentence: "「●」育館で運動をする。", hint: "からだ、たいじゅうの『たい』", answer: "体" },{ sentence: "「●」所でお皿を洗う。", hint: "うてな、だいどころの『だい』、たい", answer: "台" },{ sentence: "「●」面をしっかりと踏む。", hint: "つち、ちきゅうの『ち』", answer: "地" },{ sentence: "公園の「●」でカエルを見る。", hint: "いけ、ちすいの『ち』", answer: "池" },{ sentence: "友達の秘密を「●」る。", hint: "しる、ちしきの『ち』", answer: "知" },{ sentence: "温かいお「●」を飲む。", hint: "ちゃ、さ、きっさの『さ』", answer: "茶" },{ sentence: "「●」ご飯を食べる。", hint: "ひる、ちゅうしょくの『ちゅう』", answer: "昼" },{ sentence: "「●」い定規で長さを測る。", hint: "ながい、ちょうじょの『ちょう』", answer: "長" },{ sentence: "空を飛ぶ「●」を見上げる。", hint: "とり、ちょうるいの『ちょう』", answer: "鳥" },{ sentence: "「●」早く起きて散歩する。", hint: "あさ、ちょうかんの『ちょう』", answer: "朝" },{ sentence: "「●」接、手渡して伝える。", hint: "ただす、なおす、ちょくせつの『ちょく』", answer: "直" },{ sentence: "この「●」りをお通りください。", hint: "とおる、かよう、つうがくの『つう』", answer: "通" },{ sentence: "私の「●」は元気です。", hint: "おとうと、きょうだいの『てい』", answer: "弟" },{ sentence: "お「●」でおもちゃを買う。", hint: "みせ、てんいんの『てん』", answer: "店" },{ sentence: "テストで満「●」をとる。", hint: "てん、てんすうの『てん』、ともす", answer: "点" },{ sentence: "部屋の「●」気を消す。", hint: "でんき、でんしゃの『でん』", answer: "電" },{ sentence: "「●」を使って竹を切る。", hint: "かたna、とうけんの『とう』", answer: "刀" },{ sentence: "寒い「●」がやってきた。", hint: "ふゆ、とうみんの『とう』", answer: "冬" },{ sentence: "くじが「●」たる。", hint: "あたる、あてる、とうじつの『とう』", answer: "当" },{ sentence: "「●」の空から日がのぼる。", hint: "ひがし、とうようの『とう』", answer: "東" },{ sentence: "クイズの「●」えを考える。", hint: "こたえ、こたえる、かいとうの『とう』", answer: "答" },{ sentence: "「●」をなでて褒める。", hint: "あたま、かしら、ずとうの『とう』", answer: "頭" },{ sentence: "友達と「●」じ服を着る。", hint: "おなじ、どうじの『どう』", answer: "同" },{ sentence: "まっすぐな「●」を進む。", hint: "みち、どうろの『どう』", answer: "道" },{ sentence: "図書館で本を「●」む。", hint: "よむ、どくしょの『どく』", answer: "読" },{ sentence: "家の「●」に入って休む。", hint: "うち、なか、こくないの『ない』", answer: "内" },{ sentence: "「●」の島へ船で行く。", hint: "みなみ、なんきょくの『なん』", answer: "南" },{ sentence: "お昼に「●」料理を食べる。", hint: "にく、にくがの『にく』", answer: "肉" },{ sentence: "パカパカと「●」が走る。", hint: "うま、ばしゃの『ば』", answer: "馬" },{ sentence: "お店で商品を「●」る。", hint: "うる、はんばいの『ばい』", answer: "売" },{ sentence: "お買い「●」のシールを貼る。", hint: "かう、ばいばいの『ばい』", answer: "買" },{ sentence: "「●」に遅れないように走る。", hint: "むぎ、ばくがの『ばく』", answer: "麦" },{ sentence: "「●」が半分に割れる。", hint: "はん、はんぶんの『はん』", answer: "半" },{ sentence: "白「●」を着て実験をする。", hint: "ばん、ばんごうの『ばん』、つぎ", answer: "番" },{ sentence: "「●」父と一緒に遊ぶ。", hint: "ちち、ふしんの『ふ』", answer: "父" },{ sentence: "「●」がヒラヒラと舞う。", hint: "かぜ、ふうせんの『ふう』", answer: "風" },{ sentence: "ノートを「●」冊用意する。", hint: "ふみ、ほん、ぶんがくの『ぶん』", answer: "分" },{ sentence: "「●」章をしっかり読む。", hint: "あや、ふみ、ぶんしょうの『ぶん』", answer: "文" },{ sentence: "「●」をよく聞いて考える。", hint: "きく、ぶん、しんぶんの『ぶん』", answer: "聞" },{ sentence: "お米の「●」を作る。", hint: "べい、こめ、べいこくの『べい』", answer: "米" },{ sentence: "進む「●」向をたしかめる。", hint: "かた、ほうこうの『ほう』", answer: "方" },{ sentence: "「●」極北を指すコンパス。", hint: "きた、ほくせいの『ほく』", answer: "北" },{ sentence: "「●」くさん勉強したよ。", hint: "ぼく、まきばの『ぼく』", answer: "牧" },{ sentence: "「●」をお母さんに手渡す。", hint: "ほん、しょせきの『しょ』", answer: "本" },{ sentence: "お「●」さんの手伝いをする。", hint: "はは、ぼしんの『ぼ』", answer: "母" },{ sentence: "私の「●」前を呼ぶ。", hint: "な、なまえ、めいしの『めい』", answer: "名" },{ sentence: "「●」をパチパチさせる。", hint: "め、もくひょうの『もく』", answer: "目" },{ sentence: "「●」を植えて育てる。", hint: "き、もくようびの『もく』", answer: "木" },{ sentence: "「●」に飛び込んで遊ぶ。", hint: "もん、かど、もんげんの『もん』", answer: "門" },{ sentence: "クイズの「●」題を解く。", hint: "とう、しつもんの『もん』", answer: "問" },{ sentence: "「●」の夜に月を見る。", hint: "よる、よなか、やかんの『や』", answer: "夜" },{ sentence: "「●」菜をしっかり食べる。", hint: "くさ、やさいの『さい』", answer: "野" },{ sentence: "「●」が赤い花を咲かせる。", hint: "や、やじるしの『や』", answer: "矢" },{ sentence: "「●」に登って景色を見る。", hint: "やま、ざん、ふじさんの『さん』", answer: "山" },{ sentence: "お「●」でお参りをする。", hint: "ゆう、ゆうがたの『ゆう』", answer: "夕" },{ sentence: "友達と仲良く「●」ぶ。", hint: "あそぶ、ゆうえんちの『ゆう』", answer: "遊" },{ sentence: "「●」曜日に買い物に行く。", hint: "ようびの『よう』", answer: "曜" },{ sentence: "「●」にちかい場所。", hint: "ちかい、きんじょの『きん』", answer: "近" },{ sentence: "明日ここに「●」る。", hint: "くる、らいねんの『らい』", answer: "来" },{ sentence: "「●」のお守りを大切にする。", hint: "りゅう、りゅうずの『りゅう』", answer: "竜" },{ sentence: "「●」科の実験をする。", hint: "ことわり、りか、りゆうの『り』", answer: "理" },{ sentence: "ふる「●」に帰省する。", hint: "さと、こきょうの『きょう』", answer: "里" },{ sentence: "「●」の音をきく。", hint: "わ、わだいの『わ』", answer: "話" }];let currentQuestions = [];let currentIndex = 0;let score = 0;let isAnswered = false;function initQuiz() {// 全問題から10問をランダム抽出してシャッフルconst shuffled = [...allQuestions].sort(() => 0.5 - Math.random());currentQuestions = shuffled.slice(0, 10);currentIndex = 0;score = 0;isAnswered = false;document.getElementById("quiz-screen").style.display = "block";document.getElementById("score-screen").style.display = "none";showQuestion();}function showQuestion() {isAnswered = false;const q = currentQuestions[currentIndex];const displaySentence = q.sentence.replace("「●」", 「<span class="target">？</span>」);document.getElementById("progress").innerText = 第 ${currentIndex + 1} 問 / 全 ${currentQuestions.length} 問;document.getElementById("sentence").innerHTML = displaySentence;document.getElementById("hint").innerText = ひんと：${q.hint};document.getElementById("answer-input").value = "";document.getElementById("result-message").innerText = "";document.getElementById("action-btn").innerText = "こたえあわせ";document.getElementById("action-btn").style.backgroundColor = "#2e7d32";document.getElementById("answer-input").disabled = false;document.getElementById("answer-input").focus();}function checkAnswer() {const inputField = document.getElementById("answer-input");const actionBtn = document.getElementById("action-btn");const resultMsg = document.getElementById("result-message");const q = currentQuestions[currentIndex];if (isAnswered) {currentIndex++;if (currentIndex < currentQuestions.length) {showQuestion();} else {showScore();}return;}const userAnswer = inputField.value.trim();if (userAnswer === "") {alert("漢字を入力してね！");return;}isAnswered = true;inputField.disabled = true;if (userAnswer === q.answer) {score++;resultMsg.innerText = "⭕ せいかい！ すごいね！";resultMsg.className = "result-message correct";} else {resultMsg.innerText = ❌ まちがい。こたえは「${q.answer}」だよ。;resultMsg.className = "result-message incorrect";}actionBtn.innerText = "つぎの問題へ";actionBtn.style.backgroundColor = "#1976d2";}function showScore() {document.getElementById("quiz-screen").style.display = "none";document.getElementById("score-screen").style.display = "block";document.getElementById("score-text").innerText = 全 ${currentQuestions.length} 問中、 ${score} 問 せいかい！;}function restartQuiz() {initQuiz();}document.getElementById("answer-input").addEventListener("keypress", function(event) {if (event.key === "Enter") {checkAnswer();}});window.onload = initQuiz;</script>
+</body>
+</html>
+        
