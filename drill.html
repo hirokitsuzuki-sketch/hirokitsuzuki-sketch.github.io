@@ -1,2 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>小学2年生 漢字ドリル（10問）</title>
 
-a
+<style>
+body{
+    font-family: sans-serif;
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    background:#f5f7fa;
+}
+
+h1{
+    text-align:center;
+    color:#1976d2;
+}
+
+.controls{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+button,select{
+    font-size:18px;
+    padding:10px;
+    margin:5px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:12px;
+    text-align:center;
+}
+
+th{
+    background:#1976d2;
+    color:white;
+}
+
+.question{
+    font-size:28px;
+    font-weight:bold;
+}
+
+input{
+    width:90%;
+    font-size:22px;
+    padding:8px;
+}
+
+.correct{
+    color:green;
+    font-weight:bold;
+}
+
+.wrong{
+    color:red;
+    font-weight:bold;
+}
+
+#score{
+    margin-top:20px;
+    font-size:28px;
+    text-align:center;
+    font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<h1>柊くんの小学2年生 漢字ドリル（10問）</h1>
+
+<div class="controls">
+    <select id="mode">
+        <option value="read">漢字 → 読み</option>
+        <option value="write">読み → 漢字</option>
+    </select>
+
+    <button onclick="generateQuiz()">新しい10問</button>
+    <button onclick="gradeQuiz()">採点する</button>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>問題</th>
+            <th>答えを書く</th>
+            <th>結果</th>
+        </tr>
+    </thead>
+    <tbody id="quizBody"></tbody>
+</table>
+
+<div id="score"></div>
+
+<script>
+
+const kanjiData = [
+{kanji:"引", yomi:"ひく"},
+{kanji:"羽", yomi:"はね"},
+{kanji:"雲", yomi:"くも"},
+{kanji:"園", yomi:"その"},
+{kanji:"遠", yomi:"とおい"},
+{kanji:"何", yomi:"なに"},
+{kanji:"科", yomi:"か"},
+{kanji:"夏", yomi:"なつ"},
+{kanji:"家", yomi:"いえ"},
+{kanji:"歌", yomi:"うた"},
+{kanji:"画", yomi:"が"},
+{kanji:"回", yomi:"かい"},
+{kanji:"会", yomi:"かい"},
+{kanji:"海", yomi:"うみ"},
+{kanji:"絵", yomi:"え"},
+{kanji:"外", yomi:"そと"},
+{kanji:"角", yomi:"かど"},
+{kanji:"楽", yomi:"たのしい"},
+{kanji:"活", yomi:"かつ"},
+{kanji:"間", yomi:"あいだ"},
+{kanji:"丸", yomi:"まる"},
+{kanji:"岩", yomi:"いわ"},
+{kanji:"顔", yomi:"かお"},
+{kanji:"汽", yomi:"き"},
+{kanji:"記", yomi:"き"},
+{kanji:"帰", yomi:"かえる"},
+{kanji:"弓", yomi:"ゆみ"},
+{kanji:"牛", yomi:"うし"},
+{kanji:"魚", yomi:"さかな"},
+{kanji:"京", yomi:"きょう"}
+];
+
+let currentQuiz = [];
+
+function shuffle(array){
+    return [...array].sort(() => Math.random() - 0.5);
+}
+
+function generateQuiz(){
+
+    const mode = document.getElementById("mode").value;
+
+    currentQuiz = shuffle(kanjiData).slice(0,10);
+
+    const tbody = document.getElementById("quizBody");
+    tbody.innerHTML = "";
+
+    currentQuiz.forEach((item,index)=>{
+
+        const question =
+            mode === "read"
+            ? item.kanji
+            : item.yomi;
+
+        tbody.innerHTML += `
+        <tr>
+            <td class="question">${question}</td>
+            <td>
+                <input id="ans${index}">
+            </td>
+            <td id="result${index}"></td>
+        </tr>
+        `;
+    });
+
+    document.getElementById("score").innerHTML = "";
+}
+
+function gradeQuiz(){
+
+    const mode = document.getElementById("mode").value;
+
+    let score = 0;
+
+    currentQuiz.forEach((item,index)=>{
+
+        const userAnswer =
+            document.getElementById(`ans${index}`)
+            .value
+            .trim();
+
+        const correctAnswer =
+            mode === "read"
+            ? item.yomi
+            : item.kanji;
+
+        const resultCell =
+            document.getElementById(`result${index}`);
+
+        if(userAnswer === correctAnswer){
+
+            score++;
+
+            resultCell.innerHTML =
+            `<span class="correct">○</span>`;
+
+        }else{
+
+            resultCell.innerHTML =
+            `<span class="wrong">
+            × 正解：${correctAnswer}
+            </span>`;
+        }
+    });
+
+    document.getElementById("score").innerHTML =
+        `結果：${score} / 10 点`;
+}
+
+generateQuiz();
+
+</script>
+
+</body>
+</html>
