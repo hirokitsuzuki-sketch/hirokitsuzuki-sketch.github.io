@@ -276,10 +276,11 @@
                     <option value="20">20問</option>
                 </select>
             </div>
+              <button onclick="toggleAnswerMode()" id="answer-toggle-btn" class="btn-small">答え表示</button>
         </div>
         
         <div id="category-title" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 10px; text-align: center;"></div>
-        <button onclick="toggleAnswerMode()" id="answer-toggle-btn" class="btn-small">答え表示</button>
+      
         <div class="nav-tabs">
             <div class="tab active" onclick="filterQuestions(0)" id="tab-all">全部</div>
             <div class="tab" onclick="filterQuestions(1)" id="tab-unlearned">未</div>
