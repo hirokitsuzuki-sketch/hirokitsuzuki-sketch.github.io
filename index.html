@@ -2,1860 +2,263 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2年生の漢字 - たのしく おぼえよう！</title>
-<link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>柊くんの かんじラボ</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Serif+JP:wght@400;700&display=swap');
+
   :root {
-    --sky: #4FC3F7;
-    --sun: #FFD600;
-    --grass: #66BB6A;
-    --cherry: #F06292;
-    --peach: #FFB74D;
-    --lavender: #CE93D8;
-    --mint: #4DB6AC;
-    --coral: #FF7043;
-    --bg: #FFFDE7;
-    --card-bg: #fff;
-    --text: #37474F;
-    --shadow: 0 4px 16px rgba(0,0,0,0.10);
+    --bg: #0f1117;
+    --bg2: #161923;
+    --bg3: #1e2433;
+    --card: #1a2035;
+    --card2: #202840;
+    --accent: #4f9eff;
+    --accent2: #7b5ea7;
+    --accent3: #e85d75;
+    --gold: #f0c040;
+    --green: #3ecf8e;
+    --text: #e8eaf6;
+    --text2: #8892b0;
+    --text3: #ccd6f6;
+    --border: rgba(79,158,255,0.15);
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+    --r: 14px;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
   body {
-    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-family: 'Zen Kaku Gothic New', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
   }
 
-  /* ===== HEADER ===== */
+  #stars {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    pointer-events: none; z-index:0;
+    background: radial-gradient(ellipse at 20% 50%, rgba(79,158,255,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(123,94,167,0.06) 0%, transparent 60%);
+  }
+
+  #app { position: relative; z-index:1; max-width: 960px; margin: 0 auto; padding: 0 16px 80px; }
+
   header {
-    background: linear-gradient(135deg, var(--sky) 0%, #81D4FA 50%, var(--lavender) 100%);
-    padding: 28px 20px 20px;
+    padding: 48px 0 32px;
     text-align: center;
-    position: relative;
-    overflow: hidden;
   }
-  header::before {
-    content: '☀️';
-    font-size: 64px;
-    position: absolute;
-    top: -10px; right: 20px;
-    animation: spin 10s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
+  .logo-icon { font-size: 3rem; display: block; margin-bottom: 10px; }
   header h1 {
-    font-family: 'Kaisei Decol', serif;
-    font-size: clamp(1.6rem, 5vw, 2.8rem);
-    color: #fff;
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.15);
-    letter-spacing: 0.05em;
-  }
-  header p {
-    color: rgba(255,255,255,0.92);
-    font-size: 1rem;
-    margin-top: 6px;
-    font-weight: 700;
-  }
-
-  /* ===== NAVIGATION ===== */
-  .nav-wrap {
-    background: #fff;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .category-nav {
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-    padding: 10px 12px;
-    scrollbar-width: none;
-    max-width: 960px;
-    margin: 0 auto;
-  }
-  .category-nav::-webkit-scrollbar { display: none; }
-  .cat-btn {
-    flex-shrink: 0;
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: none;
-    background: #f5f5f5;
-    cursor: pointer;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #666;
-    transition: all 0.2s;
-    margin-right: 8px;
-  }
-  .cat-btn.active, .cat-btn:hover {
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  }
-
-  /* ===== MAIN ===== */
-  main {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 24px 16px 60px;
-  }
-
-  .section-title {
-    font-family: 'Kaisei Decol', serif;
-    font-size: 1.4rem;
-    margin-bottom: 16px;
-    padding: 10px 20px;
-    border-radius: 12px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  /* ===== KANJI GRID ===== */
-  .kanji-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 14px;
-    margin-bottom: 36px;
-  }
-
-  .kanji-card {
-    background: var(--card-bg);
-    border-radius: 18px;
-    box-shadow: var(--shadow);
-    cursor: pointer;
-    transition: transform 0.18s, box-shadow 0.18s;
-    overflow: hidden;
-    position: relative;
-    border: 3px solid transparent;
-    animation: popIn 0.3s ease backwards;
-  }
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(0.85); }
-    to { opacity: 1; transform: scale(1); }
-  }
-  .kanji-card:hover {
-    transform: translateY(-5px) scale(1.03);
-    box-shadow: 0 8px 28px rgba(0,0,0,0.16);
-  }
-  .kanji-card.learned {
-    border-color: var(--grass);
-  }
-  .kanji-card.learned::after {
-    content: '✓';
-    position: absolute;
-    top: 6px; right: 8px;
-    color: var(--grass);
-    font-size: 1rem;
-    font-weight: 800;
-  }
-
-  .card-top {
-    padding: 18px 10px 10px;
-    text-align: center;
-  }
-  .kanji-char {
-    font-family: 'Kaisei Decol', serif;
-    font-size: 3.2rem;
-    line-height: 1;
-    display: block;
-  }
-  .card-bottom {
-    padding: 8px 10px 12px;
-    text-align: center;
-    background: rgba(0,0,0,0.03);
-  }
-  .reading-on {
-    font-size: 0.72rem;
-    color: #888;
-    font-weight: 700;
+    font-family: 'Noto Serif JP', serif;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    color: var(--text3);
     letter-spacing: 0.04em;
   }
-  .reading-kun {
-    font-size: 0.82rem;
-    font-weight: 800;
-    color: var(--text);
-    margin-top: 2px;
-  }
-  .example-word {
-    font-size: 0.7rem;
-    color: #aaa;
-    margin-top: 3px;
+  header p {
+    color: var(--text2);
+    font-size: 0.95rem;
+    margin-top: 8px;
+    font-weight: 500;
   }
 
-  /* ===== MODAL ===== */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-    padding: 16px;
-  }
-  .modal-overlay.open { display: flex; }
-
-  .modal {
-    background: #fff;
-    border-radius: 24px;
-    max-width: 480px;
-    width: 100%;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    animation: modalIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    overflow: hidden;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  @keyframes modalIn {
-    from { opacity: 0; transform: scale(0.7) translateY(40px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
-  }
-
-  .modal-header {
-    padding: 24px 24px 16px;
-    text-align: center;
-    position: relative;
-  }
-  .modal-close {
-    position: absolute;
-    top: 16px; right: 16px;
-    background: #f5f5f5;
-    border: none;
-    border-radius: 50%;
-    width: 36px; height: 36px;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .modal-close:hover { background: #eee; }
-
-  .modal-kanji {
-    font-family: 'Kaisei Decol', serif;
-    font-size: 6rem;
-    display: block;
-    line-height: 1;
-  }
-  .modal-readings {
-    margin-top: 12px;
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .badge {
-    padding: 5px 14px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 700;
-  }
-  .badge-on { background: #E3F2FD; color: #1565C0; }
-  .badge-kun { background: #E8F5E9; color: #2E7D32; }
-
-  .modal-body { padding: 0 24px 24px; }
-
-  .draw-section h3 {
-    font-size: 1rem;
-    font-weight: 800;
-    margin-bottom: 10px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .stroke-order-hint {
-    font-size: 0.8rem;
-    color: #999;
-    font-weight: 400;
-  }
-
-  /* CANVAS */
-  .canvas-wrap {
-    position: relative;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-    margin-bottom: 12px;
-    background: #fff;
-  }
-  #practice-canvas {
-    display: block;
-    touch-action: none;
-    background: 
-      repeating-linear-gradient(0deg, transparent, transparent 49px, #e0e0e0 49px, #e0e0e0 50px),
-      repeating-linear-gradient(90deg, transparent, transparent 49px, #e0e0e0 49px, #e0e0e0 50px);
-    background-size: 50px 50px;
-    cursor: crosshair;
-  }
-  .guide-kanji {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Kaisei Decol', serif;
-    font-size: 120px;
-    color: rgba(0,0,0,0.07);
-    pointer-events: none;
-    user-select: none;
-    line-height: 1;
-  }
-  .canvas-center-lines {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-  .canvas-center-lines::before, .canvas-center-lines::after {
-    content: '';
-    position: absolute;
-    background: rgba(0,0,0,0.06);
-  }
-  .canvas-center-lines::before { top: 50%; left: 0; right: 0; height: 1px; }
-  .canvas-center-lines::after { left: 50%; top: 0; bottom: 0; width: 1px; }
-
-  .canvas-controls {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-  .btn {
-    padding: 10px 20px;
-    border-radius: 12px;
-    border: none;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-  .btn-clear { background: #FFF3E0; color: #E65100; }
-  .btn-learned { background: #E8F5E9; color: #2E7D32; }
-  .btn-learned.done { background: var(--grass); color: #fff; }
-
-  .example-section {
-    margin-top: 18px;
-    background: #F9FBE7;
-    border-radius: 12px;
-    padding: 14px 16px;
-  }
-  .example-section h4 { font-size: 0.9rem; color: #558B2F; margin-bottom: 8px; font-weight: 800; }
-  .example-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-  .example-list li {
-    font-size: 0.92rem;
-    display: flex; align-items: baseline; gap: 8px;
-  }
-  .example-list li .word { font-weight: 800; font-size: 1rem; }
-  .example-list li .meaning { color: #777; font-size: 0.82rem; }
-
-  /* ===== PROGRESS ===== */
-  .progress-bar-wrap {
-    background: #fff;
-    border-radius: 16px;
-    padding: 16px 20px;
-    box-shadow: var(--shadow);
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .progress-bar-wrap span { font-weight: 800; font-size: 0.95rem; white-space: nowrap; }
-  .progress-bar {
-    flex: 1;
-    height: 16px;
-    background: #f0f0f0;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--grass), var(--sky));
-    border-radius: 8px;
-    transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .progress-count { font-size: 0.85rem; color: #888; font-weight: 700; white-space: nowrap; }
-
-  /* ===== PEN SIZE ===== */
-  .pen-options {
-    display: flex; gap: 8px; align-items: center; margin-bottom: 10px;
-  }
-  .pen-label { font-size: 0.8rem; font-weight: 700; color: #888; }
-  .pen-btn {
-    border: 2px solid #e0e0e0;
-    border-radius: 50%;
-    cursor: pointer;
-    background: #fff;
-    transition: border-color 0.15s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .pen-btn.active { border-color: var(--sky); }
-  .pen-dot { background: #37474F; border-radius: 50%; }
-
-  /* ===== COLOR ===== */
-  .color-options {
-    display: flex; gap: 8px; align-items: center; margin-bottom: 12px;
-  }
-  .color-dot {
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 3px solid transparent;
-    transition: transform 0.15s, border-color 0.15s;
-  }
-  .color-dot.active { border-color: #333; transform: scale(1.2); }
-  .color-dot:hover { transform: scale(1.15); }
-
-  /* ===== QUIZ TAB ===== */
-  #quiz-section {
-    display: none;
-    text-align: center;
-  }
-  #quiz-section.visible { display: block; }
-  .quiz-prompt {
-    font-size: 1rem;
-    color: #666;
-    margin-bottom: 16px;
-    font-weight: 700;
-  }
-  .quiz-display {
-    font-family: 'Kaisei Decol', serif;
-    font-size: 5rem;
-    line-height: 1.1;
-    background: #fff;
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: var(--shadow);
-    display: inline-block;
-    min-width: 160px;
-    margin-bottom: 20px;
-  }
-  .quiz-choices {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    max-width: 400px;
-    margin: 0 auto 20px;
-  }
-  .choice-btn {
-    padding: 14px;
-    border-radius: 14px;
-    border: 3px solid #e0e0e0;
-    background: #fff;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
+  section { margin-bottom: 40px; }
+  .section-title {
     font-size: 1.05rem;
     font-weight: 700;
-    cursor: pointer;
-    transition: all 0.18s;
-  }
-  .choice-btn:hover { border-color: var(--sky); background: #E3F2FD; }
-  .choice-btn.correct { border-color: var(--grass); background: #E8F5E9; color: #2E7D32; animation: bounce 0.4s; }
-  .choice-btn.wrong { border-color: var(--coral); background: #FBE9E7; color: #BF360C; animation: shake 0.4s; }
-  @keyframes bounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
-  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
-
-  .quiz-feedback {
-    font-size: 1.2rem;
-    font-weight: 800;
-    height: 36px;
-    margin-bottom: 10px;
-  }
-  .quiz-score {
-    font-size: 0.95rem;
-    color: #777;
-    font-weight: 700;
+    color: var(--text3);
     margin-bottom: 16px;
-  }
-
-  /* ===== TABS ===== */
-  .view-tabs {
     display: flex;
+    align-items: center;
     gap: 8px;
-    margin-bottom: 24px;
-    background: #fff;
-    border-radius: 14px;
-    padding: 6px;
-    box-shadow: var(--shadow);
-    max-width: 520px;
-  }
-  .view-tab {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 10px;
-    background: transparent;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
-    font-size: 0.88rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: #aaa;
-  }
-  .view-tab.active { color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-
-  /* ===== PRACTICE MODE ===== */
-  #practice-section { display: none; }
-  #practice-section.visible { display: block; }
-
-  .practice-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-  .practice-header h2 {
-    font-family: 'Kaisei Decol', serif;
-    font-size: 1.3rem;
-    flex: 1;
-  }
-  .practice-counter {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #888;
-    background: #fff;
-    border-radius: 20px;
-    padding: 5px 16px;
-    box-shadow: var(--shadow);
   }
 
-  .practice-main {
+  .grade-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
-  }
-  @media (max-width: 600px) {
-    .practice-main { grid-template-columns: 1fr; }
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
   }
 
-  /* 左：漢字情報 */
-  .practice-info-panel {
-    background: #fff;
-    border-radius: 22px;
+  .grade-card {
+    display: block;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 24px 22px;
+    text-decoration: none;
+    color: inherit;
     box-shadow: var(--shadow);
+    transition: transform 0.18s, border-color 0.18s, background 0.18s;
+    position: relative;
     overflow: hidden;
   }
-  .practice-kanji-display {
-    text-align: center;
-    padding: 28px 20px 20px;
+  .grade-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    background: var(--card2);
   }
-  .practice-kanji-big {
-    font-family: 'Kaisei Decol', serif;
-    font-size: 7rem;
-    line-height: 1;
-    display: block;
-    transition: opacity 0.3s;
+  .grade-card .emoji { font-size: 2.2rem; display: block; margin-bottom: 10px; }
+  .grade-card h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.2rem;
+    color: var(--text3);
+    margin-bottom: 4px;
   }
-  .practice-kanji-hidden {
-    opacity: 0.08;
-  }
-  .toggle-guide-btn {
-    margin-top: 10px;
-    padding: 6px 18px;
-    border-radius: 20px;
-    border: 2px solid #e0e0e0;
-    background: #fff;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
+  .grade-card .count {
     font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-    color: #666;
-    transition: all 0.18s;
+    color: var(--text2);
+    font-weight: 500;
+    margin-bottom: 14px;
   }
-  .toggle-guide-btn:hover { border-color: #aaa; }
-  .toggle-guide-btn.guide-on { border-color: var(--sky); color: #1565C0; background: #E3F2FD; }
-
-  .practice-readings-panel {
-    padding: 14px 20px;
-    background: rgba(0,0,0,0.02);
-    border-top: 1px solid #f0f0f0;
-  }
-  .practice-readings-panel .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-  .practice-ex-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
-  .practice-ex-list li { font-size: 0.88rem; display: flex; gap: 8px; align-items: baseline; }
-  .practice-ex-list li .word { font-weight: 800; font-size: 0.96rem; }
-  .practice-ex-list li .meaning { color: #999; font-size: 0.78rem; }
-
-  .practice-nav {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 16px;
-    border-top: 1px solid #f0f0f0;
-  }
-  .nav-arrow {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    border: 2px solid #e0e0e0;
-    background: #fff;
-    font-size: 1.1rem;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s;
-    flex-shrink: 0;
-  }
-  .nav-arrow:hover:not(:disabled) { border-color: #aaa; background: #f5f5f5; }
-  .nav-arrow:disabled { opacity: 0.3; cursor: default; }
-  .nav-dots {
-    flex: 1;
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .nav-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: #e0e0e0;
-    cursor: pointer;
-    transition: all 0.18s;
-    flex-shrink: 0;
-  }
-  .nav-dot.active { background: var(--current-color, #4FC3F7); transform: scale(1.3); }
-  .nav-dot.done { background: var(--grass); }
-
-  .practice-learned-btn {
-    width: 100%;
-    padding: 11px;
-    border: none;
-    border-radius: 0 0 0 0;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
-    font-size: 0.95rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.18s;
-    background: #f5f5f5;
-    color: #666;
-  }
-  .practice-learned-btn.done { background: var(--grass); color: #fff; }
-  .practice-learned-btn:hover { filter: brightness(0.95); }
-
-  /* 右：キャンバスパネル */
-  .practice-canvas-panel {
-    background: #fff;
-    border-radius: 22px;
-    box-shadow: var(--shadow);
+  .grade-progress-bar {
+    height: 8px;
+    background: var(--bg3);
+    border-radius: 4px;
     overflow: hidden;
-  }
-  .practice-canvas-header {
-    padding: 14px 18px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-  }
-  .practice-canvas-header h3 { font-size: 0.95rem; font-weight: 800; }
-
-  .practice-pen-row {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    padding: 0 18px 10px;
-    flex-wrap: wrap;
-  }
-  .practice-pen-label { font-size: 0.75rem; font-weight: 700; color: #aaa; }
-
-  .practice-canvas-wrap {
-    position: relative;
-    background: #fff;
-    margin: 0 0 0 0;
-  }
-  #practice-main-canvas {
-    display: block;
-    touch-action: none;
-    cursor: crosshair;
-    width: 100%;
-    background:
-      linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-  .practice-guide-overlay {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Kaisei Decol', serif;
-    font-size: 140px;
-    color: rgba(0,0,0,0.06);
-    pointer-events: none;
-    user-select: none;
-    line-height: 1;
-    transition: opacity 0.3s;
-  }
-  .practice-center-h {
-    position: absolute;
-    top: 50%; left: 0; right: 0;
-    height: 1px;
-    background: rgba(0,0,0,0.07);
-    pointer-events: none;
-  }
-  .practice-center-v {
-    position: absolute;
-    left: 50%; top: 0; bottom: 0;
-    width: 1px;
-    background: rgba(0,0,0,0.07);
-    pointer-events: none;
-  }
-  .practice-canvas-footer {
-    display: flex;
-    gap: 10px;
-    padding: 12px 14px;
-    border-top: 1px solid #f5f5f5;
-    flex-wrap: wrap;
-  }
-  .practice-canvas-footer .btn { flex: 1; justify-content: center; min-width: 80px; }
-
-  /* repeat boxes */
-  .repeat-boxes {
-    display: flex;
-    gap: 6px;
-    padding: 10px 14px 0;
-    justify-content: center;
-  }
-  .repeat-box {
-    width: 32px; height: 32px;
-    border: 2px solid #e0e0e0;
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem;
-    font-family: 'Kaisei Decol', serif;
-    cursor: pointer;
-    transition: all 0.18s;
-    background: #fafafa;
-    color: transparent;
-    user-select: none;
-  }
-  .repeat-box.filled { border-color: var(--current-color, #4FC3F7); color: var(--current-color, #4FC3F7); background: #fff; }
-  .repeat-box-label {
-    text-align: center;
-    font-size: 0.72rem;
-    color: #bbb;
-    font-weight: 700;
-    padding-bottom: 8px;
-  }
-
-  /* 完了画面 */
-  .practice-complete {
-    text-align: center;
-    padding: 40px 24px;
-    background: #fff;
-    border-radius: 22px;
-    box-shadow: var(--shadow);
-    display: none;
-  }
-  .practice-complete.visible { display: block; }
-  .complete-emoji { font-size: 4rem; display: block; margin-bottom: 12px; animation: bounce2 0.6s ease infinite alternate; }
-  @keyframes bounce2 { from { transform: translateY(0); } to { transform: translateY(-12px); } }
-  .complete-title { font-family: 'Kaisei Decol', serif; font-size: 1.8rem; margin-bottom: 8px; }
-  .complete-sub { font-size: 1rem; color: #888; margin-bottom: 20px; }
-  .complete-stars { font-size: 2rem; margin-bottom: 20px; }
-  .btn-restart { background: var(--sky); color: #fff; margin: 0 auto; }
-
-  /* ===== PRACTICE WRITE MODE ===== */
-  .practice-select-title {
-    font-family: 'Kaisei Decol', serif;
-    font-size: 1.3rem;
-    margin-bottom: 18px;
-    color: var(--text);
-  }
-  .practice-cat-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 14px;
-    margin-bottom: 32px;
-  }
-  .practice-cat-card {
-    border-radius: 18px;
-    padding: 20px 18px;
-    cursor: pointer;
-    color: #fff;
-    box-shadow: var(--shadow);
-    transition: transform 0.18s, box-shadow 0.18s;
-    position: relative;
-    overflow: hidden;
-  }
-  .practice-cat-card:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 8px 28px rgba(0,0,0,0.18); }
-  .practice-cat-card-emoji { font-size: 2.2rem; display: block; margin-bottom: 6px; }
-  .practice-cat-card-name { font-size: 1.05rem; font-weight: 800; display: block; margin-bottom: 4px; }
-  .practice-cat-card-count { font-size: 0.82rem; opacity: 0.85; }
-  .practice-cat-card-progress {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    height: 5px; background: rgba(255,255,255,0.25);
-  }
-  .practice-cat-card-progress-fill {
-    height: 100%; background: rgba(255,255,255,0.8);
-    border-radius: 0 0 18px 18px;
-    transition: width 0.4s;
-  }
-
-  /* ---- practice main ---- */
-  .pw-header {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 14px; flex-wrap: wrap;
-  }
-  .pw-back-btn {
-    padding: 8px 16px; border-radius: 20px; border: 2px solid #e0e0e0;
-    background: #fff; font-family: 'M PLUS Rounded 1c', sans-serif;
-    font-size: 0.88rem; font-weight: 700; cursor: pointer; color: #666;
-    transition: all 0.15s; flex-shrink: 0;
-  }
-  .pw-back-btn:hover { border-color: #aaa; }
-  .pw-title {
-    font-family: 'Kaisei Decol', serif; font-size: 1.2rem; flex: 1;
-  }
-  .pw-counter {
-    font-size: 0.88rem; font-weight: 700; color: #888;
-    background: #fff; border-radius: 20px; padding: 5px 14px;
-    box-shadow: var(--shadow); flex-shrink: 0;
-  }
-
-  /* 進捗ドット */
-  .pw-dots-row {
-    display: flex; flex-wrap: wrap; gap: 6px;
-    margin-bottom: 18px; padding: 10px 14px;
-    background: #fff; border-radius: 14px; box-shadow: var(--shadow);
-  }
-  .pw-dot {
-    width: 28px; height: 28px; border-radius: 50%;
-    background: #eee; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Kaisei Decol', serif; font-size: 0.75rem;
-    transition: all 0.18s; color: #aaa;
-    font-weight: 700;
-  }
-  .pw-dot.done { color: #fff; }
-  .pw-dot:hover { transform: scale(1.15); }
-
-  /* スクロールエリア：全漢字を横並びスクロール */
-  .pw-scroll-area {
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    padding: 4px 2px 20px;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: thin;
-  }
-  .pw-scroll-area::-webkit-scrollbar { height: 6px; }
-  .pw-scroll-area::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 3px; }
-  .pw-scroll-area::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-
-  /* 1枚の漢字練習カード */
-  .pw-kanji-card {
-    flex-shrink: 0;
-    width: 280px;
-    background: #fff;
-    border-radius: 22px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    scroll-snap-align: start;
-    border-top: 6px solid #ddd;
-    transition: box-shadow 0.2s;
-  }
-  .pw-kanji-card.done-card { box-shadow: 0 4px 20px rgba(102,187,106,0.25); }
-
-  .pw-card-info {
-    padding: 16px 16px 12px;
-    text-align: center;
-    border-bottom: 1px solid #f5f5f5;
-    position: relative;
-  }
-  .pw-card-kanji {
-    font-family: 'Kaisei Decol', serif;
-    font-size: 4rem; line-height: 1;
-    display: block; margin-bottom: 6px;
-  }
-  .pw-card-readings {
-    display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;
     margin-bottom: 6px;
   }
-  .pw-card-ex {
-    font-size: 0.75rem; color: #aaa;
+  .grade-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+    border-radius: 4px;
+    transition: width 0.5s;
   }
-  .pw-card-done-mark {
-    position: absolute; top: 10px; right: 12px;
-    font-size: 1.3rem; opacity: 0;
-    transition: opacity 0.3s;
+  .grade-progress-label {
+    font-size: 0.76rem;
+    color: var(--text2);
+    font-weight: 700;
   }
-  .pw-kanji-card.done-card .pw-card-done-mark { opacity: 1; }
+  .grade-card .arrow {
+    position: absolute;
+    top: 22px; right: 22px;
+    color: var(--text2);
+    font-size: 1.1rem;
+    transition: transform 0.18s, color 0.18s;
+  }
+  .grade-card:hover .arrow { transform: translateX(4px); color: var(--accent); }
 
-  /* キャンバス部分 */
-  .pw-canvas-wrap {
-    position: relative;
-    background: #fafafa;
+  .drill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
   }
-  .pw-canvas {
+  .drill-card {
     display: block;
-    touch-action: none;
-    cursor: crosshair;
-    width: 100%;
-    background:
-      linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
-    background-size: 35px 35px;
-  }
-  .pw-guide {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    font-family: 'Kaisei Decol', serif; font-size: 110px;
-    pointer-events: none; user-select: none; line-height: 1;
-    transition: opacity 0.3s;
-  }
-  .pw-cross-h { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(0,0,0,0.07); pointer-events: none; }
-  .pw-cross-v { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(0,0,0,0.07); pointer-events: none; }
-
-  .pw-card-footer {
-    padding: 10px 12px;
-    display: flex; gap: 8px; align-items: center;
-    border-top: 1px solid #f5f5f5; flex-wrap: wrap;
-  }
-  .pw-clear-btn {
-    padding: 7px 14px; border-radius: 10px; border: none;
-    background: #FFF3E0; color: #E65100;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
-    font-size: 0.82rem; font-weight: 700; cursor: pointer;
-    transition: all 0.15s;
-  }
-  .pw-clear-btn:hover { filter: brightness(0.95); }
-  .pw-done-btn {
-    flex: 1; padding: 8px 10px; border-radius: 10px; border: none;
-    background: #f0f0f0; color: #888;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
-    font-size: 0.82rem; font-weight: 700; cursor: pointer;
-    transition: all 0.18s;
-  }
-  .pw-done-btn.active { background: var(--grass); color: #fff; }
-  .pw-done-btn:hover { filter: brightness(0.95); }
-
-  /* ガイド表示切替 */
-  .pw-guide-toggle {
-    padding: 5px 10px; border-radius: 8px;
-    border: 2px solid #e0e0e0; background: #fff;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
-    font-size: 0.75rem; font-weight: 700; cursor: pointer;
-    color: #888; transition: all 0.15s;
-  }
-  .pw-guide-toggle.on { border-color: var(--sky); color: #1565C0; background: #E3F2FD; }
-
-  /* ペン・色ツールバー */
-  .pw-toolbar {
-    padding: 8px 12px 6px;
-    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-    border-bottom: 1px solid #f5f5f5;
-  }
-  .pw-pen-btn {
-    border: 2px solid #e0e0e0; border-radius: 50%;
-    cursor: pointer; background: #fff;
-    display: flex; align-items: center; justify-content: center;
-    transition: border-color 0.15s;
-  }
-  .pw-pen-btn.active { border-color: #4FC3F7; }
-  .pw-pen-dot { background: #37474F; border-radius: 50%; }
-  .pw-color-dot {
-    width: 22px; height: 22px; border-radius: 50%;
-    cursor: pointer; border: 3px solid transparent;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: inherit;
     transition: transform 0.15s, border-color 0.15s;
   }
-  .pw-color-dot.active { border-color: #333; transform: scale(1.2); }
-
-  /* 完了バナー */
-  .pw-complete-banner {
-    text-align: center; padding: 40px 24px;
-    background: #fff; border-radius: 22px;
-    box-shadow: var(--shadow); margin-top: 20px;
+  .drill-card:hover { transform: translateY(-2px); border-color: var(--accent2); }
+  .drill-card .name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text3);
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 4px;
   }
-  .pw-complete-emoji { font-size: 4rem; display: block; margin-bottom: 12px; animation: bounce2 0.6s ease infinite alternate; }
-  @keyframes bounce2 { from { transform: translateY(0); } to { transform: translateY(-12px); } }
-  .pw-complete-text { font-family: 'Kaisei Decol', serif; font-size: 1.6rem; margin-bottom: 8px; }
-  .pw-complete-stars { font-size: 2rem; margin-bottom: 20px; }
-  .pw-restart-btn {
-    display: inline-block; margin: 6px 8px;
-    padding: 12px 24px; border-radius: 14px;
-    border: none; cursor: pointer;
-    font-family: 'M PLUS Rounded 1c', sans-serif;
-    font-size: 0.95rem; font-weight: 700;
-    background: var(--sky); color: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    transition: all 0.15s;
+  .drill-card .desc {
+    font-size: 0.78rem;
+    color: var(--text2);
   }
-  .pw-restart-btn:hover { transform: translateY(-2px); }
-  .pw-restart-outline { background: #fff !important; border: 2px solid var(--sky) !important; color: var(--sky) !important; }
 
-  /* responsive */
-  @media (max-width: 500px) {
-    .kanji-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
-    .kanji-char { font-size: 2.6rem; }
-    .modal-kanji { font-size: 4.5rem; }
-    .pw-kanji-card { width: 240px; }
+  footer {
+    text-align: center;
+    padding: 24px 0;
+    color: var(--text2);
+    font-size: 0.78rem;
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>🎒 柊くんの2年生の かんじ</h1>
-  <p>たのしく おぼえて はかせに なろう！</p>
-</header>
+<div id="stars"></div>
 
-<div class="nav-wrap">
-  <div class="category-nav" id="catNav"></div>
-</div>
+<div id="app">
+  <header>
+    <span class="logo-icon">🎓</span>
+    <h1>柊くんの かんじラボ</h1>
+    <p>がくねんを えらんで べんきょうを はじめよう！</p>
+  </header>
 
-<main>
-  <div class="progress-bar-wrap">
-    <span>📚 がくしゅう</span>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  <section>
+    <div class="section-title">📚 がくねんべつ かんじマスター</div>
+    <div class="grade-grid" id="gradeGrid">
+      <a class="grade-card" href="index2.html">
+        <span class="arrow">→</span>
+        <span class="emoji">🌱</span>
+        <h3>2年生</h3>
+        <div class="count">160字 ・ カード＋書き取り＋クイズ</div>
+        <div class="grade-progress-bar"><div class="grade-progress-fill" id="fill2" style="width:0%"></div></div>
+        <div class="grade-progress-label" id="label2">0 / 160</div>
+      </a>
+      <a class="grade-card" href="index3.html">
+        <span class="arrow">→</span>
+        <span class="emoji">🌿</span>
+        <h3>3年生</h3>
+        <div class="count">200字 ・ カード＋書き取り＋クイズ</div>
+        <div class="grade-progress-bar"><div class="grade-progress-fill" id="fill3" style="width:0%"></div></div>
+        <div class="grade-progress-label" id="label3">0 / 200</div>
+      </a>
+      <a class="grade-card" href="index4.html">
+        <span class="arrow">→</span>
+        <span class="emoji">🌳</span>
+        <h3>4年生</h3>
+        <div class="count">202字 ・ カード＋書き取り＋クイズ</div>
+        <div class="grade-progress-bar"><div class="grade-progress-fill" id="fill4" style="width:0%"></div></div>
+        <div class="grade-progress-label" id="label4">0 / 202</div>
+      </a>
     </div>
-    <span class="progress-count" id="progressCount">0 / 160</span>
-  </div>
+  </section>
 
-  <div class="view-tabs">
-    <button class="view-tab active" id="tabCards" onclick="switchView('cards')">📖 カード</button>
-    <button class="view-tab" id="tabPractice" onclick="switchView('practice')">✏️ れんしゅう</button>
-    <button class="view-tab" id="tabQuiz" onclick="switchView('quiz')">🎯 クイズ</button>
-  </div>
-
-  <div id="cards-section">
-    <div id="kanjiContent"></div>
-  </div>
-
-  <div id="quiz-section">
-    <p class="quiz-prompt" id="quizPrompt">よみがなは どれ？</p>
-    <div class="quiz-display" id="quizDisplay">？</div>
-    <div class="quiz-feedback" id="quizFeedback"></div>
-    <div class="quiz-score" id="quizScore">せいかい: 0 / 0</div>
-    <div class="quiz-choices" id="quizChoices"></div>
-    <button class="btn" style="background:var(--sky);color:#fff;margin:0 auto;" onclick="nextQuiz()">つぎの もんだい ▶</button>
-  </div>
-
-  <!-- ===== 書き練習セクション ===== -->
-  <div id="practice-section" style="display:none;">
-    <div id="practice-select">
-      <div class="practice-select-title">✏️ カテゴリを えらんでね</div>
-      <div class="practice-cat-grid" id="practiceCatGrid"></div>
+  <section>
+    <div class="section-title">✏️ 2年生の ドリルで ちからだめし</div>
+    <div class="drill-grid">
+      <a class="drill-card" href="drill.html">
+        <div class="name">📝 かんじドリル（10問）</div>
+        <div class="desc">よみがなを こたえる きほんドリル</div>
+      </a>
+      <a class="drill-card" href="drill2.html">
+        <div class="name">📖 完全網羅ドリル（160字）</div>
+        <div class="desc">文章の あなうめで こたえる ランダム10問</div>
+      </a>
+      <a class="drill-card" href="drill3.html">
+        <div class="name">🗂️ カテゴリ別ドリル</div>
+        <div class="desc">なかまの かんじを えらんで れんしゅう</div>
+      </a>
     </div>
-    <div id="practice-main" style="display:none;">
-      <div class="pw-header">
-        <button class="pw-back-btn" onclick="backToPracticeSelect()">← もどる</button>
-        <div class="pw-title" id="pwTitle"></div>
-        <div class="pw-counter" id="pwCounter"></div>
-      </div>
-      <div class="pw-dots-row" id="pwDotsRow"></div>
-      <div class="pw-scroll-area" id="pwScrollArea"></div>
-      <div class="pw-complete-banner" id="pwCompleteBanner" style="display:none;">
-        <span class="pw-complete-emoji">🎉</span>
-        <div class="pw-complete-text">ぜんぶ かけたね！ すごい！</div>
-        <div class="pw-complete-stars">⭐⭐⭐</div>
-        <button class="pw-restart-btn" onclick="restartPractice()">もういちど</button>
-        <button class="pw-restart-btn pw-restart-outline" onclick="backToPracticeSelect()">カテゴリにもどる</button>
-      </div>
-    </div>
-  </div>
-</main>
+  </section>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal">
-    <div class="modal-header" id="modalHeaderBg">
-      <button class="modal-close" onclick="closeModal()">✕</button>
-      <span class="modal-kanji" id="modalKanji"></span>
-      <div class="modal-readings" id="modalReadings"></div>
-    </div>
-    <div class="modal-body">
-      <div class="draw-section">
-        <h3>✏️ かいてみよう <span class="stroke-order-hint">（ガイドにそわせて なぞろう）</span></h3>
-        <div class="pen-options">
-          <span class="pen-label">ふとさ：</span>
-          <button class="pen-btn active" style="width:28px;height:28px;" onclick="setPen(4,this)">
-            <div class="pen-dot" style="width:6px;height:6px;"></div>
-          </button>
-          <button class="pen-btn" style="width:32px;height:32px;" onclick="setPen(8,this)">
-            <div class="pen-dot" style="width:10px;height:10px;"></div>
-          </button>
-          <button class="pen-btn" style="width:36px;height:36px;" onclick="setPen(14,this)">
-            <div class="pen-dot" style="width:16px;height:16px;"></div>
-          </button>
-        </div>
-        <div class="color-options">
-          <div class="color-dot active" style="background:#37474F;" onclick="setColor('#37474F',this)"></div>
-          <div class="color-dot" style="background:#E53935;" onclick="setColor('#E53935',this)"></div>
-          <div class="color-dot" style="background:#1E88E5;" onclick="setColor('#1E88E5',this)"></div>
-          <div class="color-dot" style="background:#43A047;" onclick="setColor('#43A047',this)"></div>
-          <div class="color-dot" style="background:#8E24AA;" onclick="setColor('#8E24AA',this)"></div>
-          <div class="color-dot" style="background:#FB8C00;" onclick="setColor('#FB8C00',this)"></div>
-        </div>
-        <div class="canvas-wrap" id="canvasWrap">
-          <canvas id="practice-canvas" width="300" height="300"></canvas>
-          <div class="guide-kanji" id="guideKanji"></div>
-          <div class="canvas-center-lines"></div>
-        </div>
-        <div class="canvas-controls">
-          <button class="btn btn-clear" onclick="clearCanvas()">🗑️ けす</button>
-          <button class="btn btn-learned" id="learnedBtn" onclick="markLearned()">⭐ おぼえた！</button>
-        </div>
-      </div>
-
-      <div class="example-section">
-        <h4>📝 つかいかた</h4>
-        <ul class="example-list" id="exampleList"></ul>
-      </div>
-    </div>
-  </div>
+  <footer>柊くんの かんじラボ</footer>
 </div>
 
 <script>
-// ===== DATA =====
-const KANJI_DATA = {
-  "いきもの・しぜん": {
-    color: "#66BB6A",
-    emoji: "🌿",
-    list: [
-      { k:"魚", on:"ギョ", kun:"さかな・うお", ex:[["金魚","きんぎょ（goldfish）"],["魚屋","さかなや（fish shop）"]] },
-      { k:"鳥", on:"チョウ", kun:"とり", ex:[["小鳥","ことり（small bird）"],["鳥かご","とりかご（birdcage）"]] },
-      { k:"虫", on:"チュウ", kun:"むし", ex:[["虫歯","むしば（cavity）"],["昆虫","こんちゅう（insect）"]] },
-      { k:"草", on:"ソウ", kun:"くさ", ex:[["草原","そうげん（grassland）"],["雑草","ざっそう（weed）"]] },
-      { k:"花", on:"カ", kun:"はな", ex:[["花びん","かびん（vase）"],["花火","はなび（fireworks）"]] },
-      { k:"木", on:"ボク・モク", kun:"き", ex:[["木曜日","もくようび（Thursday）"],["木陰","こかげ（shade）"]] },
-      { k:"竹", on:"チク", kun:"たけ", ex:[["竹やぶ","たけやぶ（bamboo grove）"],["竹馬","たけうま（stilts）"]] },
-      { k:"米", on:"マイ・ベイ", kun:"こめ", ex:[["白米","はくまい（white rice）"],["米国","べいこく（USA）"]] },
-      { k:"麦", on:"バク", kun:"むぎ", ex:[["小麦","こむぎ（wheat）"],["麦茶","むぎちゃ（barley tea）"]] },
-      { k:"野", on:"ヤ", kun:"の", ex:[["野原","のはら（field）"],["野菜","やさい（vegetable）"]] },
-      { k:"山", on:"サン", kun:"やま", ex:[["火山","かざん（volcano）"],["山道","やまみち（mountain path）"]] },
-      { k:"川", on:"セン", kun:"かわ", ex:[["川岸","かわぎし（riverbank）"],["川魚","かわざかな（river fish）"]] },
-      { k:"海", on:"カイ", kun:"うみ", ex:[["海水","かいすい（sea water）"],["海岸","かいがん（coast）"]] },
-      { k:"池", on:"チ", kun:"いけ", ex:[["池","いけ（pond）"],["電池","でんち（battery）"]] },
-      { k:"石", on:"セキ", kun:"いし", ex:[["石橋","いしばし（stone bridge）"],["宝石","ほうせき（gem）"]] },
-      { k:"風", on:"フウ", kun:"かぜ", ex:[["台風","たいふう（typhoon）"],["風船","ふうせん（balloon）"]] },
-      { k:"雨", on:"ウ", kun:"あめ", ex:[["雨水","あまみず（rainwater）"],["大雨","おおあめ（heavy rain）"]] },
-      { k:"雪", on:"セツ", kun:"ゆき", ex:[["雪だるま","ゆきだるま（snowman）"],["大雪","おおゆき（heavy snow）"]] },
-      { k:"雲", on:"ウン", kun:"くも", ex:[["入道雲","にゅうどうぐも（cumulonimbus）"],["雲海","うんかい（sea of clouds）"]] },
-      { k:"光", on:"コウ", kun:"ひかり", ex:[["光線","こうせん（ray）"],["月光","げっこう（moonlight）"]] },
-    ]
-  },
-  "からだ・にんげん": {
-    color: "#F06292",
-    emoji: "👦",
-    list: [
-      { k:"体", on:"タイ", kun:"からだ", ex:[["体育","たいいく（gym class）"],["体温","たいおん（body temp）"]] },
-      { k:"頭", on:"トウ", kun:"あたま", ex:[["頭痛","ずつう（headache）"],["頭上","ずじょう（overhead）"]] },
-      { k:"顔", on:"ガン", kun:"かお", ex:[["顔色","かおいろ（complexion）"],["顔文字","かおもじ（emoticon）"]] },
-      { k:"目", on:"モク", kun:"め", ex:[["目玉","めだま（eyeball）"],["目薬","めぐすり（eyedrops）"]] },
-      { k:"耳", on:"ジ", kun:"みみ", ex:[["耳元","みみもと（near the ear）"],["耳鳴り","みみなり（tinnitus）"]] },
-      { k:"口", on:"コウ・ク", kun:"くち", ex:[["口調","くちょう（tone）"],["出口","でぐち（exit）"]] },
-      { k:"手", on:"シュ", kun:"て", ex:[["手紙","てがみ（letter）"],["手足","てあし（hands and feet）"]] },
-      { k:"足", on:"ソク", kun:"あし", ex:[["足音","あしおと（footstep）"],["足首","あしくび（ankle）"]] },
-      { k:"心", on:"シン", kun:"こころ", ex:[["心配","しんぱい（worry）"],["中心","ちゅうしん（center）"]] },
-      { k:"首", on:"シュ", kun:"くび", ex:[["首相","しゅしょう（prime minister）"],["首都","しゅと（capital city）"]] },
-    ]
-  },
-  "かず・かたち": {
-    color: "#FFB74D",
-    emoji: "🔢",
-    list: [
-      { k:"万", on:"マン", kun:"よろず", ex:[["一万","いちまん（ten thousand）"],["万能","ばんのう（almighty）"]] },
-      { k:"半", on:"ハン", kun:"なか・ば", ex:[["半分","はんぶん（half）"],["前半","ぜんはん（first half）"]] },
-      { k:"丸", on:"ガン", kun:"まる", ex:[["丸い","まるい（round）"],["丸太","まるた（log）"]] },
-      { k:"角", on:"カク", kun:"かど", ex:[["角度","かくど（angle）"],["四角","しかく（square）"]] },
-      { k:"形", on:"ケイ", kun:"かたち", ex:[["形式","けいしき（format）"],["人形","にんぎょう（doll）"]] },
-      { k:"数", on:"スウ", kun:"かず", ex:[["数学","すうがく（math）"],["人数","にんずう（number of people）"]] },
-      { k:"長", on:"チョウ", kun:"なが・い", ex:[["長さ","ながさ（length）"],["校長","こうちょう（principal）"]] },
-      { k:"太", on:"タ", kun:"ふとい", ex:[["太陽","たいよう（sun）"],["太鼓","たいこ（drum）"]] },
-      { k:"細", on:"サイ", kun:"ほそ・い", ex:[["細かい","こまかい（detailed）"],["明細","めいさい（details）"]] },
-      { k:"同", on:"ドウ", kun:"おな・じ", ex:[["同じ","おなじ（same）"],["同時","どうじ（simultaneous）"]] },
-    ]
-  },
-  "うごき・じかん": {
-    color: "#4FC3F7",
-    emoji: "⏰",
-    list: [
-      { k:"来", on:"ライ", kun:"く・る", ex:[["来月","らいげつ（next month）"],["往来","おうらい（coming and going）"]] },
-      { k:"行", on:"コウ", kun:"い・く", ex:[["旅行","りょこう（travel）"],["銀行","ぎんこう（bank）"]] },
-      { k:"帰", on:"キ", kun:"かえ・る", ex:[["帰国","きこく（return home）"],["帰り道","かえりみち（way home）"]] },
-      { k:"走", on:"ソウ", kun:"はし・る", ex:[["走者","そうしゃ（runner）"],["競走","きょうそう（race）"]] },
-      { k:"引", on:"イン", kun:"ひ・く", ex:[["引力","いんりょく（gravity）"],["引っ越し","ひっこし（moving）"]] },
-      { k:"止", on:"シ", kun:"と・まる", ex:[["禁止","きんし（prohibition）"],["停止","ていし（stop）"]] },
-      { k:"歩", on:"ホ・ブ", kun:"ある・く", ex:[["散歩","さんぽ（walk）"],["歩道","ほどう（sidewalk）"]] },
-      { k:"聞", on:"ブン・モン", kun:"き・く", ex:[["新聞","しんぶん（newspaper）"],["聞き手","ききて（listener）"]] },
-      { k:"読", on:"ドク", kun:"よ・む", ex:[["読書","どくしょ（reading）"],["読者","どくしゃ（reader）"]] },
-      { k:"書", on:"ショ", kun:"か・く", ex:[["書道","しょどう（calligraphy）"],["教科書","きょうかしょ（textbook）"]] },
-      { k:"話", on:"ワ", kun:"はな・す", ex:[["会話","かいわ（conversation）"],["童話","どうわ（fairy tale）"]] },
-      { k:"売", on:"バイ", kun:"う・る", ex:[["売店","ばいてん（kiosk）"],["売り場","うりば（sales floor）"]] },
-      { k:"買", on:"バイ", kun:"か・う", ex:[["買い物","かいもの（shopping）"],["売買","ばいばい（trade）"]] },
-      { k:"切", on:"セツ", kun:"き・る", ex:[["切手","きって（stamp）"],["大切","たいせつ（important）"]] },
-      { k:"分", on:"ブン・フン", kun:"わ・かる", ex:[["分かる","わかる（understand）"],["時間","じかん（time）"]] },
-      { k:"回", on:"カイ", kun:"まわ・る", ex:[["回転","かいてん（rotation）"],["今回","こんかい（this time）"]] },
-      { k:"合", on:"ゴウ", kun:"あ・う", ex:[["合格","ごうかく（pass）"],["集合","しゅうごう（gathering）"]] },
-      { k:"作", on:"サク", kun:"つく・る", ex:[["作品","さくひん（work）"],["制作","せいさく（production）"]] },
-      { k:"食", on:"ショク", kun:"た・べる", ex:[["食事","しょくじ（meal）"],["食べ物","たべもの（food）"]] },
-      { k:"飲", on:"イン", kun:"の・む", ex:[["飲み物","のみもの（drink）"],["飲食","いんしょく（food and drink）"]] },
-    ]
-  },
-  "がっこう・まち": {
-    color: "#CE93D8",
-    emoji: "🏫",
-    list: [
-      { k:"学", on:"ガク", kun:"まな・ぶ", ex:[["学校","がっこう（school）"],["学習","がくしゅう（learning）"]] },
-      { k:"校", on:"コウ", kun:"", ex:[["学校","がっこう（school）"],["校庭","こうてい（schoolyard）"]] },
-      { k:"教", on:"キョウ", kun:"おし・える", ex:[["教室","きょうしつ（classroom）"],["教科","きょうか（subject）"]] },
-      { k:"室", on:"シツ", kun:"", ex:[["教室","きょうしつ（classroom）"],["室内","しつない（indoor）"]] },
-      { k:"間", on:"カン", kun:"あいだ", ex:[["時間","じかん（time）"],["人間","にんげん（human being）"]] },
-      { k:"楽", on:"ガク・ラク", kun:"たの・しい", ex:[["音楽","おんがく（music）"],["楽しい","たのしい（fun）"]] },
-      { k:"図", on:"ズ・ト", kun:"", ex:[["図書館","としょかん（library）"],["地図","ちず（map）"]] },
-      { k:"画", on:"ガ", kun:"", ex:[["絵画","かいが（painting）"],["画家","がか（painter）"]] },
-      { k:"工", on:"コウ", kun:"", ex:[["工場","こうじょう（factory）"],["工作","こうさく（craft）"]] },
-      { k:"場", on:"ジョウ", kun:"ば", ex:[["運動場","うんどうじょう（playground）"],["場所","ばしょ（place）"]] },
-      { k:"門", on:"モン", kun:"かど", ex:[["正門","せいもん（main gate）"],["専門","せんもん（specialty）"]] },
-      { k:"道", on:"ドウ", kun:"みち", ex:[["道路","どうろ（road）"],["歩道","ほどう（sidewalk）"]] },
-      { k:"店", on:"テン", kun:"みせ", ex:[["本屋","ほんや（bookstore）"],["店員","てんいん（clerk）"]] },
-      { k:"市", on:"シ", kun:"いち", ex:[["市場","いちば（market）"],["都市","とし（city）"]] },
-      { k:"町", on:"チョウ", kun:"まち", ex:[["下町","したまち（downtown）"],["町中","まちなか（in town）"]] },
-      { k:"村", on:"ソン", kun:"むら", ex:[["村人","むらびと（villager）"],["農村","のうそん（farming village）"]] },
-    ]
-  },
-  "ひと・くらし": {
-    color: "#4DB6AC",
-    emoji: "👨‍👩‍👧",
-    list: [
-      { k:"父", on:"フ", kun:"ちち", ex:[["父親","ちちおや（father）"],["父母","ふぼ（parents）"]] },
-      { k:"母", on:"ボ", kun:"はは", ex:[["母親","ははおや（mother）"],["母国","ぼこく（home country）"]] },
-      { k:"兄", on:"ケイ", kun:"あに", ex:[["兄弟","きょうだい（siblings）"],["お兄さん","おにいさん（older brother）"]] },
-      { k:"弟", on:"テイ", kun:"おとうと", ex:[["弟子","でし（disciple）"],["兄弟","きょうだい（siblings）"]] },
-      { k:"姉", on:"シ", kun:"あね", ex:[["お姉さん","おねえさん（older sister）"],["姉妹","しまい（sisters）"]] },
-      { k:"妹", on:"マイ", kun:"いもうと", ex:[["妹","いもうと（younger sister）"],["姉妹","しまい（sisters）"]] },
-      { k:"友", on:"ユウ", kun:"とも", ex:[["友達","ともだち（friend）"],["友人","ゆうじん（friend）"]] },
-      { k:"家", on:"カ", kun:"いえ", ex:[["家族","かぞく（family）"],["家庭","かてい（household）"]] },
-      { k:"科", on:"カ", kun:"", ex:[["科学","かがく（science）"],["外科","げか（surgery）"]] },
-      { k:"地", on:"チ", kun:"", ex:[["地図","ちず（map）"],["大地","だいち（the earth）"]] },
-      { k:"方", on:"ホウ", kun:"かた", ex:[["方向","ほうこう（direction）"],["地方","ちほう（region）"]] },
-      { k:"国", on:"コク", kun:"くに", ex:[["外国","がいこく（foreign country）"],["国語","こくご（Japanese）"]] },
-      { k:"言", on:"ゲン", kun:"い・う", ex:[["言葉","ことば（word）"],["名言","めいげん（famous quote）"]] },
-      { k:"語", on:"ゴ", kun:"かた・る", ex:[["国語","こくご（Japanese）"],["英語","えいご（English）"]] },
-      { k:"記", on:"キ", kun:"しる・す", ex:[["日記","にっき（diary）"],["記念","きねん（commemoration）"]] },
-      { k:"算", on:"サン", kun:"", ex:[["算数","さんすう（arithmetic）"],["計算","けいさん（calculation）"]] },
-      { k:"春", on:"シュン", kun:"はる", ex:[["春分","しゅんぶん（spring equinox）"],["春風","はるかぜ（spring breeze）"]] },
-      { k:"夏", on:"カ", kun:"なつ", ex:[["夏休み","なつやすみ（summer break）"],["夏至","げし（summer solstice）"]] },
-      { k:"秋", on:"シュウ", kun:"あき", ex:[["秋風","あきかぜ（autumn breeze）"],["秋分","しゅうぶん（autumnal equinox）"]] },
-      { k:"冬", on:"トウ", kun:"ふゆ", ex:[["冬休み","ふゆやすみ（winter break）"],["冬眠","とうみん（hibernation）"]] },
-      { k:"朝", on:"チョウ", kun:"あさ", ex:[["朝食","ちょうしょく（breakfast）"],["今朝","けさ（this morning）"]] },
-      { k:"昼", on:"チュウ", kun:"ひる", ex:[["昼食","ちゅうしょく（lunch）"],["昼間","ひるま（daytime）"]] },
-      { k:"夜", on:"ヤ", kun:"よる", ex:[["夜空","よぞら（night sky）"],["今夜","こんや（tonight）"]] },
-      { k:"午", on:"ゴ", kun:"", ex:[["午前","ごぜん（AM）"],["午後","ごご（PM）"]] },
-      { k:"曜", on:"ヨウ", kun:"", ex:[["日曜日","にちようび（Sunday）"],["木曜日","もくようび（Thursday）"]] },
-    ]
-  },
-  "いろ・ようす": {
-    color: "#FF7043",
-    emoji: "🌈",
-    list: [
-      { k:"色", on:"ショク", kun:"いろ", ex:[["色紙","いろがみ（colored paper）"],["原色","げんしょく（primary color）"]] },
-      { k:"黒", on:"コク", kun:"くろ", ex:[["黒板","こくばん（blackboard）"],["黒星","くろぼし（loss）"]] },
-      { k:"白", on:"ハク", kun:"しろ", ex:[["白雪","しらゆき（white snow）"],["白鳥","はくちょう（swan）"]] },
-      { k:"赤", on:"セキ", kun:"あか", ex:[["赤道","せきどう（equator）"],["赤ちゃん","あかちゃん（baby）"]] },
-      { k:"青", on:"セイ", kun:"あお", ex:[["青空","あおぞら（blue sky）"],["青葉","あおば（green leaves）"]] },
-      { k:"強", on:"キョウ", kun:"つよ・い", ex:[["強さ","つよさ（strength）"],["強調","きょうちょう（emphasis）"]] },
-      { k:"弱", on:"ジャク", kun:"よわ・い", ex:[["弱点","じゃくてん（weakness）"],["弱虫","よわむし（coward）"]] },
-      { k:"明", on:"メイ", kun:"あかるい", ex:[["明るい","あかるい（bright）"],["明日","あした（tomorrow）"]] },
-      { k:"暗", on:"アン", kun:"くら・い", ex:[["暗闇","くらやみ（darkness）"],["暗記","あんき（memorization）"]] },
-      { k:"多", on:"タ", kun:"おお・い", ex:[["多数","たすう（many）"],["多様","たよう（diverse）"]] },
-      { k:"少", on:"ショウ", kun:"すく・ない", ex:[["少し","すこし（a little）"],["少年","しょうねん（boy）"]] },
-      { k:"高", on:"コウ", kun:"たか・い", ex:[["高校","こうこう（high school）"],["高さ","たかさ（height）"]] },
-      { k:"低", on:"テイ", kun:"ひく・い", ex:[["低温","ていおん（low temperature）"],["低地","ていち（lowland）"]] },
-      { k:"広", on:"コウ", kun:"ひろ・い", ex:[["広場","ひろば（plaza）"],["広大","こうだい（vast）"]] },
-      { k:"新", on:"シン", kun:"あたら・しい", ex:[["新聞","しんぶん（newspaper）"],["最新","さいしん（latest）"]] },
-      { k:"古", on:"コ", kun:"ふる・い", ex:[["古代","こだい（ancient times）"],["古典","こてん（classic）"]] },
-    ]
-  },
-};
-
-// ===== STATE =====
-const learned = new Set(JSON.parse(localStorage.getItem('learned2nen')||'[]'));
-let currentKanji = null;
-let penSize = 4;
-let penColor = '#37474F';
-let isDrawing = false;
-let lastX = 0, lastY = 0;
-let quizMode = 'reading'; // 'reading' or 'writing'
-let quizKanji = null;
-let quizScore = { correct: 0, total: 0 };
-let quizAnswered = false;
-const cats = Object.keys(KANJI_DATA);
-const catColors = { 0:"#66BB6A",1:"#F06292",2:"#FFB74D",3:"#4FC3F7",4:"#CE93D8",5:"#4DB6AC",6:"#FF7043" };
-let activeCategory = cats[0];
-
-function allKanji() {
-  return cats.flatMap(c => KANJI_DATA[c].list);
-}
-
-// ===== INIT =====
-function init() {
-  // build category nav
-  const nav = document.getElementById('catNav');
-  cats.forEach((cat, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'cat-btn' + (cat === activeCategory ? ' active' : '');
-    btn.textContent = KANJI_DATA[cat].emoji + ' ' + cat;
-    btn.style.cssText = cat === activeCategory
-      ? `background:${KANJI_DATA[cat].color};color:#fff;`
-      : '';
-    btn.onclick = () => selectCategory(cat, btn, i);
-    nav.appendChild(btn);
-  });
-  renderCards();
-  updateProgress();
-  initCanvas();
-  nextQuiz();
-}
-
-function selectCategory(cat, btn, i) {
-  activeCategory = cat;
-  document.querySelectorAll('.cat-btn').forEach(b => {
-    b.classList.remove('active');
-    b.style.cssText = '';
-  });
-  btn.classList.add('active');
-  btn.style.cssText = `background:${KANJI_DATA[cat].color};color:#fff;`;
-  renderCards();
-}
-
-function renderCards() {
-  const content = document.getElementById('kanjiContent');
-  content.innerHTML = '';
-  const catData = KANJI_DATA[activeCategory];
-  
-  const titleEl = document.createElement('div');
-  titleEl.className = 'section-title';
-  titleEl.style.background = catData.color;
-  titleEl.innerHTML = `${catData.emoji} ${activeCategory}`;
-  content.appendChild(titleEl);
-
-  const grid = document.createElement('div');
-  grid.className = 'kanji-grid';
-
-  catData.list.forEach((item, i) => {
-    const card = document.createElement('div');
-    card.className = 'kanji-card' + (learned.has(item.k) ? ' learned' : '');
-    card.style.animationDelay = (i * 0.03) + 's';
-    card.style.borderTop = `5px solid ${catData.color}`;
-    card.innerHTML = `
-      <div class="card-top">
-        <span class="kanji-char" style="color:${catData.color}">${item.k}</span>
-      </div>
-      <div class="card-bottom">
-        <div class="reading-on">音：${item.on}</div>
-        <div class="reading-kun">訓：${item.kun||'—'}</div>
-        <div class="example-word">${item.ex[0][0]}</div>
-      </div>
-    `;
-    card.onclick = () => openModal(item, catData.color);
-    grid.appendChild(card);
-  });
-
-  content.appendChild(grid);
-}
-
-function updateProgress() {
-  const total = allKanji().length;
-  const done = learned.size;
-  const pct = total > 0 ? (done / total * 100) : 0;
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressCount').textContent = `${done} / ${total}`;
-}
-
-// ===== MODAL =====
-function openModal(item, color) {
-  currentKanji = item;
-  document.getElementById('modalKanji').textContent = item.k;
-  document.getElementById('modalKanji').style.color = color;
-  document.getElementById('modalHeaderBg').style.background = color + '18';
-  document.getElementById('guideKanji').textContent = item.k;
-
-  const readingsEl = document.getElementById('modalReadings');
-  readingsEl.innerHTML = `
-    <span class="badge badge-on">音：${item.on}</span>
-    ${item.kun ? `<span class="badge badge-kun">訓：${item.kun}</span>` : ''}
-  `;
-
-  const exList = document.getElementById('exampleList');
-  exList.innerHTML = item.ex.map(([word, info]) =>
-    `<li><span class="word">${word}</span><span class="meaning">${info}</span></li>`
-  ).join('');
-
-  const learnedBtn = document.getElementById('learnedBtn');
-  if (learned.has(item.k)) {
-    learnedBtn.classList.add('done');
-    learnedBtn.textContent = '✅ おぼえた！';
-  } else {
-    learnedBtn.classList.remove('done');
-    learnedBtn.textContent = '⭐ おぼえた！';
-  }
-
-  clearCanvas();
-  document.getElementById('modalOverlay').classList.add('open');
-}
-
-function closeModal(e) {
-  if (e && e.target !== document.getElementById('modalOverlay')) return;
-  document.getElementById('modalOverlay').classList.remove('open');
-}
-
-function markLearned() {
-  if (!currentKanji) return;
-  if (learned.has(currentKanji.k)) {
-    learned.delete(currentKanji.k);
-    document.getElementById('learnedBtn').classList.remove('done');
-    document.getElementById('learnedBtn').textContent = '⭐ おぼえた！';
-  } else {
-    learned.add(currentKanji.k);
-    document.getElementById('learnedBtn').classList.add('done');
-    document.getElementById('learnedBtn').textContent = '✅ おぼえた！';
-  }
-  localStorage.setItem('learned2nen', JSON.stringify([...learned]));
-  updateProgress();
-  renderCards();
-}
-
-// ===== CANVAS =====
-function initCanvas() {
-  const canvas = document.getElementById('practice-canvas');
-  const wrap = document.getElementById('canvasWrap');
-  
-  function resize() {
-    const w = Math.min(wrap.clientWidth, 320);
-    canvas.width = w;
-    canvas.height = w;
-    canvas.style.width = w + 'px';
-    canvas.style.height = w + 'px';
-  }
-  resize();
-
-  const ctx = canvas.getContext('2d');
-
-  function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const src = e.touches ? e.touches[0] : e;
-    return [(src.clientX - rect.left) * scaleX, (src.clientY - rect.top) * scaleY];
-  }
-
-  function startDraw(e) {
-    e.preventDefault();
-    isDrawing = true;
-    [lastX, lastY] = getPos(e);
-  }
-  function draw(e) {
-    if (!isDrawing) return;
-    e.preventDefault();
-    const [x, y] = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.strokeStyle = penColor;
-    ctx.lineWidth = penSize;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.stroke();
-    [lastX, lastY] = [x, y];
-  }
-  function endDraw() { isDrawing = false; }
-
-  canvas.addEventListener('mousedown', startDraw);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('mouseup', endDraw);
-  canvas.addEventListener('touchstart', startDraw, { passive: false });
-  canvas.addEventListener('touchmove', draw, { passive: false });
-  canvas.addEventListener('touchend', endDraw);
-}
-
-function clearCanvas() {
-  const canvas = document.getElementById('practice-canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-function setPen(size, btn) {
-  penSize = size;
-  document.querySelectorAll('.pen-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-function setColor(color, dot) {
-  penColor = color;
-  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-  dot.classList.add('active');
-}
-
-// ===== QUIZ =====
-function switchView(view) {
-  document.getElementById('cards-section').style.display = view === 'cards' ? '' : 'none';
-  document.getElementById('quiz-section').style.display = view === 'quiz' ? 'block' : 'none';
-  document.getElementById('practice-section').style.display = view === 'practice' ? 'block' : 'none';
-
-  const tabs = { cards:'tabCards', practice:'tabPractice', quiz:'tabQuiz' };
-  const colors = { cards:'#4FC3F7', practice:'#66BB6A', quiz:'#F06292' };
-  Object.entries(tabs).forEach(([v, id]) => {
-    const el = document.getElementById(id);
-    el.classList.toggle('active', v === view);
-    el.style.background = v === view ? colors[v] : '';
-    el.style.color = v === view ? '#fff' : '';
-  });
-
-  if (view === 'quiz') nextQuiz();
-  if (view === 'practice') renderPracticeSelect();
-}
-
-// ===== PRACTICE WRITE MODE =====
-let pwCategory = null;
-let pwDoneSet = new Set();
-let pwPenSize = 6;
-let pwPenColor = '#37474F';
-let pwCanvases = {}; // key: kanji char -> { ctx, isDrawing, lastX, lastY }
-
-function renderPracticeSelect() {
-  document.getElementById('practice-select').style.display = '';
-  document.getElementById('practice-main').style.display = 'none';
-  document.getElementById('pwCompleteBanner').style.display = 'none';
-
-  const grid = document.getElementById('practiceCatGrid');
-  grid.innerHTML = '';
-  cats.forEach(cat => {
-    const data = KANJI_DATA[cat];
-    const total = data.list.length;
-    const done = data.list.filter(k => learned.has(k.k)).length;
-    const pct = total > 0 ? (done / total * 100) : 0;
-
-    const card = document.createElement('div');
-    card.className = 'practice-cat-card';
-    card.style.background = `linear-gradient(135deg, ${data.color}, ${data.color}cc)`;
-    card.innerHTML = `
-      <span class="practice-cat-card-emoji">${data.emoji}</span>
-      <span class="practice-cat-card-name">${cat}</span>
-      <span class="practice-cat-card-count">${total}字のれんしゅう</span>
-      <div class="practice-cat-card-progress">
-        <div class="practice-cat-card-progress-fill" style="width:${pct}%"></div>
-      </div>
-    `;
-    card.onclick = () => startPractice(cat);
-    grid.appendChild(card);
-  });
-}
-
-function startPractice(cat) {
-  pwCategory = cat;
-  pwDoneSet = new Set();
-  pwCanvases = {};
-  document.getElementById('practice-select').style.display = 'none';
-  document.getElementById('practice-main').style.display = 'block';
-  document.getElementById('pwCompleteBanner').style.display = 'none';
-
-  const data = KANJI_DATA[cat];
-  document.getElementById('pwTitle').innerHTML = `<span style="color:${data.color}">${data.emoji} ${cat}</span>`;
-
-  renderPwDots();
-  renderPwCards();
-}
-
-function renderPwDots() {
-  const data = KANJI_DATA[pwCategory];
-  const row = document.getElementById('pwDotsRow');
-  row.innerHTML = '';
-  data.list.forEach((item, i) => {
-    const dot = document.createElement('div');
-    dot.className = 'pw-dot' + (pwDoneSet.has(item.k) ? ' done' : '');
-    dot.style.background = pwDoneSet.has(item.k) ? KANJI_DATA[pwCategory].color : '#eee';
-    dot.style.color = pwDoneSet.has(item.k) ? '#fff' : '#aaa';
-    dot.textContent = item.k;
-    dot.title = item.k;
-    dot.onclick = () => {
-      const card = document.getElementById('pwcard-' + i);
-      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-    };
-    row.appendChild(dot);
-  });
-  updatePwCounter();
-}
-
-function updatePwCounter() {
-  const data = KANJI_DATA[pwCategory];
-  document.getElementById('pwCounter').textContent = `${pwDoneSet.size} / ${data.list.length}`;
-}
-
-function renderPwCards() {
-  const data = KANJI_DATA[pwCategory];
-  const area = document.getElementById('pwScrollArea');
-  area.innerHTML = '';
-
-  data.list.forEach((item, i) => {
-    const card = document.createElement('div');
-    card.className = 'pw-kanji-card' + (pwDoneSet.has(item.k) ? ' done-card' : '');
-    card.id = 'pwcard-' + i;
-    card.style.borderTopColor = data.color;
-
-    card.innerHTML = `
-      <div class="pw-card-info">
-        <span class="pw-card-kanji" style="color:${data.color}">${item.k}</span>
-        <div class="pw-card-readings">
-          <span class="badge badge-on">音：${item.on}</span>
-          ${item.kun ? `<span class="badge badge-kun">訓：${item.kun}</span>` : ''}
-        </div>
-        <div class="pw-card-ex">${item.ex.map(([w,m])=>`<b>${w}</b> ${m}`).join('　')}</div>
-        <div class="pw-card-done-mark">✅</div>
-      </div>
-      <div class="pw-toolbar" id="pwtoolbar-${i}">
-        <button class="pw-pen-btn active" style="width:26px;height:26px;" data-idx="${i}" data-size="4" onclick="setPwPen(${i},4,this)"><div class="pw-pen-dot" style="width:5px;height:5px;"></div></button>
-        <button class="pw-pen-btn" style="width:30px;height:30px;" data-idx="${i}" data-size="8" onclick="setPwPen(${i},8,this)"><div class="pw-pen-dot" style="width:9px;height:9px;"></div></button>
-        <button class="pw-pen-btn" style="width:34px;height:34px;" data-idx="${i}" data-size="14" onclick="setPwPen(${i},14,this)"><div class="pw-pen-dot" style="width:14px;height:14px;"></div></button>
-        <div style="width:1px;height:20px;background:#eee;margin:0 2px;"></div>
-        ${['#37474F','#E53935','#1E88E5','#43A047','#FB8C00'].map(c=>`<div class="pw-color-dot ${c==='#37474F'?'active':''}" style="background:${c}" onclick="setPwColor(${i},'${c}',this)"></div>`).join('')}
-        <div style="flex:1"></div>
-        <button class="pw-guide-toggle on" id="pwguide-${i}" onclick="togglePwGuide(${i})">ガイド表示</button>
-      </div>
-      <div class="pw-canvas-wrap" id="pwwrap-${i}">
-        <canvas class="pw-canvas" id="pwcanvas-${i}"></canvas>
-        <div class="pw-guide" id="pwguidetext-${i}" style="color:rgba(0,0,0,0.07)">${item.k}</div>
-        <div class="pw-cross-h"></div>
-        <div class="pw-cross-v"></div>
-      </div>
-      <div class="pw-card-footer">
-        <button class="pw-clear-btn" onclick="clearPwCanvas(${i})">🗑️ けす</button>
-        <button class="pw-done-btn ${pwDoneSet.has(item.k)?'active':''}" id="pwdone-${i}" onclick="togglePwDone(${i},'${item.k}')">
-          ${pwDoneSet.has(item.k) ? '✅ かけた！' : '⭐ かけた！'}
-        </button>
-      </div>
-    `;
-    area.appendChild(card);
-  });
-
-  // canvasを初期化（次のフレームでサイズが確定してから）
-  requestAnimationFrame(() => {
-    data.list.forEach((item, i) => {
-      initPwCanvas(i, item, data.color);
-    });
-  });
-}
-
-function initPwCanvas(i, item, color) {
-  const canvas = document.getElementById('pwcanvas-' + i);
-  const wrap = document.getElementById('pwwrap-' + i);
-  if (!canvas || !wrap) return;
-
-  const size = wrap.clientWidth || 280;
-  canvas.width = size;
-  canvas.height = size;
-
-  const ctx = canvas.getContext('2d');
-
-  const state = { ctx, isDrawing: false, lastX: 0, lastY: 0, penSize: 6, penColor: '#37474F' };
-  pwCanvases[i] = state;
-
-  function getPos(e) {
-    const rect = canvas.getBoundingClientRect();
-    const sx = canvas.width / rect.width;
-    const sy = canvas.height / rect.height;
-    const src = e.touches ? e.touches[0] : e;
-    return [(src.clientX - rect.left) * sx, (src.clientY - rect.top) * sy];
-  }
-  function onStart(e) {
-    e.preventDefault();
-    state.isDrawing = true;
-    [state.lastX, state.lastY] = getPos(e);
-  }
-  function onMove(e) {
-    if (!state.isDrawing) return;
-    e.preventDefault();
-    const [x, y] = getPos(e);
-    ctx.beginPath();
-    ctx.moveTo(state.lastX, state.lastY);
-    ctx.lineTo(x, y);
-    ctx.strokeStyle = state.penColor;
-    ctx.lineWidth = state.penSize;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.stroke();
-    [state.lastX, state.lastY] = [x, y];
-  }
-  function onEnd() { state.isDrawing = false; }
-
-  canvas.addEventListener('mousedown', onStart);
-  canvas.addEventListener('mousemove', onMove);
-  canvas.addEventListener('mouseup', onEnd);
-  canvas.addEventListener('mouseleave', onEnd);
-  canvas.addEventListener('touchstart', onStart, { passive: false });
-  canvas.addEventListener('touchmove', onMove, { passive: false });
-  canvas.addEventListener('touchend', onEnd);
-}
-
-function clearPwCanvas(i) {
-  const state = pwCanvases[i];
-  if (!state) return;
-  const canvas = document.getElementById('pwcanvas-' + i);
-  state.ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-function setPwPen(i, size, btn) {
-  if (!pwCanvases[i]) return;
-  pwCanvases[i].penSize = size;
-  const toolbar = document.getElementById('pwtoolbar-' + i);
-  toolbar.querySelectorAll('.pw-pen-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-
-function setPwColor(i, color, dot) {
-  if (!pwCanvases[i]) return;
-  pwCanvases[i].penColor = color;
-  const toolbar = document.getElementById('pwtoolbar-' + i);
-  toolbar.querySelectorAll('.pw-color-dot').forEach(d => d.classList.remove('active'));
-  dot.classList.add('active');
-}
-
-function togglePwGuide(i) {
-  const guide = document.getElementById('pwguidetext-' + i);
-  const btn = document.getElementById('pwguide-' + i);
-  if (!guide) return;
-  if (guide.style.color.includes('0.07')) {
-    guide.style.color = 'rgba(0,0,0,0)';
-    btn.classList.remove('on');
-    btn.textContent = 'ガイドなし';
-  } else {
-    guide.style.color = 'rgba(0,0,0,0.07)';
-    btn.classList.add('on');
-    btn.textContent = 'ガイド表示';
+function loadLearnedCount(key) {
+  try {
+    const s = localStorage.getItem(key);
+    if (!s) return 0;
+    const parsed = JSON.parse(s);
+    if (parsed.learnedKanji) return parsed.learnedKanji.length;
+    return 0;
+  } catch (e) {
+    return 0;
   }
 }
 
-function togglePwDone(i, kanji) {
-  const btn = document.getElementById('pwdone-' + i);
-  const card = document.getElementById('pwcard-' + i);
-  if (pwDoneSet.has(kanji)) {
-    pwDoneSet.delete(kanji);
-    btn.classList.remove('active');
-    btn.textContent = '⭐ かけた！';
-    card.classList.remove('done-card');
-  } else {
-    pwDoneSet.add(kanji);
-    btn.classList.add('active');
-    btn.textContent = '✅ かけた！';
-    card.classList.add('done-card');
-    // おぼえた！にも反映
-    learned.add(kanji);
-    localStorage.setItem('learned2nen', JSON.stringify([...learned]));
-    updateProgress();
-  }
-  renderPwDots();
-
-  // 全部完了チェック
-  const data = KANJI_DATA[pwCategory];
-  if (pwDoneSet.size === data.list.length) {
-    setTimeout(() => {
-      document.getElementById('pwCompleteBanner').style.display = 'block';
-      document.getElementById('pwCompleteBanner').scrollIntoView({ behavior: 'smooth' });
-    }, 400);
-  }
+function applyProgress(id, learned, total) {
+  const pct = total > 0 ? Math.min(100, Math.round((learned / total) * 100)) : 0;
+  document.getElementById('fill' + id).style.width = pct + '%';
+  document.getElementById('label' + id).textContent = learned + ' / ' + total;
 }
 
-function restartPractice() {
-  pwDoneSet = new Set();
-  pwCanvases = {};
-  document.getElementById('pwCompleteBanner').style.display = 'none';
-  renderPwDots();
-  renderPwCards();
-  document.getElementById('pwScrollArea').scrollLeft = 0;
-}
-
-function backToPracticeSelect() {
-  document.getElementById('practice-select').style.display = '';
-  document.getElementById('practice-main').style.display = 'none';
-  renderPracticeSelect();
-}
-
-function nextQuiz() {
-  quizAnswered = false;
-  const all = allKanji();
-  quizKanji = all[Math.floor(Math.random() * all.length)];
-
-  // find category color
-  let qColor = '#4FC3F7';
-  for (const [cat, data] of Object.entries(KANJI_DATA)) {
-    if (data.list.find(k => k.k === quizKanji.k)) { qColor = data.color; break; }
-  }
-
-  // randomly pick mode: show kanji → pick reading, OR show reading → pick kanji
-  const modes = ['reading', 'kanji'];
-  quizMode = modes[Math.floor(Math.random() * 2)];
-
-  const display = document.getElementById('quizDisplay');
-  const prompt = document.getElementById('quizPrompt');
-
-  if (quizMode === 'reading') {
-    prompt.textContent = 'この かんじの よみかたは？';
-    display.textContent = quizKanji.k;
-    display.style.color = qColor;
-  } else {
-    const reading = quizKanji.kun || quizKanji.on.split('・')[0];
-    prompt.textContent = 'この よみかたの かんじは？';
-    display.textContent = reading;
-    display.style.color = qColor;
-    display.style.fontSize = '2.8rem';
-  }
-
-  // wrong options
-  const wrongs = shuffle(all.filter(k => k.k !== quizKanji.k)).slice(0, 3);
-  const options = shuffle([quizKanji, ...wrongs]);
-
-  const choicesEl = document.getElementById('quizChoices');
-  choicesEl.innerHTML = '';
-  document.getElementById('quizFeedback').textContent = '';
-
-  options.forEach(opt => {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    if (quizMode === 'reading') {
-      btn.textContent = opt.kun || opt.on.split('・')[0];
-    } else {
-      btn.textContent = opt.k;
-      btn.style.fontSize = '1.8rem';
-      btn.style.fontFamily = "'Kaisei Decol', serif";
-    }
-    btn.onclick = () => checkAnswer(opt.k === quizKanji.k, btn);
-    choicesEl.appendChild(btn);
-  });
-}
-
-function checkAnswer(correct, btn) {
-  if (quizAnswered) return;
-  quizAnswered = true;
-  quizScore.total++;
-  const feedback = document.getElementById('quizFeedback');
-  if (correct) {
-    quizScore.correct++;
-    btn.classList.add('correct');
-    feedback.textContent = '🎉 せいかい！すごい！';
-    feedback.style.color = '#2E7D32';
-  } else {
-    btn.classList.add('wrong');
-    feedback.textContent = '😅 ざんねん… もういちど！';
-    feedback.style.color = '#BF360C';
-    // show correct
-    document.querySelectorAll('.choice-btn').forEach(b => {
-      const isCorrect = quizMode === 'reading'
-        ? (b.textContent === (quizKanji.kun || quizKanji.on.split('・')[0]))
-        : (b.textContent === quizKanji.k);
-      if (isCorrect) b.classList.add('correct');
-    });
-  }
-  document.getElementById('quizScore').textContent = `せいかい: ${quizScore.correct} / ${quizScore.total}`;
-}
-
-function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
-
-init();
+applyProgress(2, loadLearnedCount('kanji_state'), 160);
+applyProgress(3, loadLearnedCount('kanji3_state'), 200);
+applyProgress(4, loadLearnedCount('kanji4_state'), 202);
 </script>
+
 </body>
 </html>
