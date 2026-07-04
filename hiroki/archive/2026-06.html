@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI News Portal - 2026-06</title>
+<meta name="description" content="2026-06 のニュースアーカイブ">
+<style>
+  :root {
+    --bg: #f7f8fb; --bg2: #ffffff; --card: #ffffff; --border: #e2e5ec;
+    --text: #1b1f2a; --text2: #5a6072;
+    --accent: #3d6bff; --accent2: #7b5ea7; --shadow: 0 4px 16px rgba(20,25,40,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0f1117; --bg2:#161923; --card:#1a2035; --border:rgba(79,158,255,0.15); --text:#e8eaf6; --text2:#8892b0; --shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  }
+  html[data-theme="light"] { --bg:#f7f8fb; --bg2:#ffffff; --card:#ffffff; --border:#e2e5ec; --text:#1b1f2a; --text2:#5a6072; --shadow: 0 4px 16px rgba(20,25,40,0.06); }
+  html[data-theme="dark"] { --bg:#0f1117; --bg2:#161923; --card:#1a2035; --border:rgba(79,158,255,0.15); --text:#e8eaf6; --text2:#8892b0; --shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif; background: var(--bg); color: var(--text); min-height:100vh; }
+  #app { max-width: 880px; margin: 0 auto; padding: 24px 16px 64px; }
+  header { padding: 16px 0 24px; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+  header h1 { font-size: clamp(1.3rem, 4vw, 1.8rem); }
+  header p { color: var(--text2); font-size:0.85rem; margin-top:6px; }
+  nav a { color: var(--accent); text-decoration:none; font-size:0.85rem; margin-right:12px; }
+  #themeToggle { background: var(--card); border:1px solid var(--border); border-radius:8px; padding:6px 12px; cursor:pointer; color:var(--text); font-size:0.85rem; }
+  .controls { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+  #searchBox { flex:1; min-width:180px; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:var(--text); font-size:0.9rem; }
+  select { padding:9px 10px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:var(--text); font-size:0.9rem; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:20px; }
+  .chip { padding:5px 12px; border-radius:999px; border:1px solid var(--border); background:var(--bg2); color:var(--text2); font-size:0.8rem; cursor:pointer; user-select:none; }
+  .chip.active { background: var(--accent); border-color: var(--accent); color:#fff; }
+  #count { color: var(--text2); font-size:0.82rem; margin-bottom:14px; }
+  .card { display:block; background: var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:12px; box-shadow: var(--shadow); text-decoration:none; color:inherit; }
+  .card .meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:0.76rem; color: var(--text2); margin-bottom:6px; }
+  .badge { background: rgba(61,107,255,0.12); color: var(--accent); padding:2px 8px; border-radius:6px; font-weight:600; }
+  .stars { color:#f0c040; letter-spacing:1px; }
+  .card h3 { font-size:1.02rem; margin-bottom:4px; line-height:1.4; }
+  .card p { font-size:0.86rem; color: var(--text2); line-height:1.55; }
+  #empty { text-align:center; color: var(--text2); padding: 40px 0; display:none; }
+  footer { text-align:center; padding-top:24px; color: var(--text2); font-size:0.76rem; }
+  .archive-list { list-style:none; }
+  .archive-list li { margin-bottom:8px; }
+  .archive-list a { color: var(--accent); text-decoration:none; font-size:0.95rem; }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div>
+      <h1>AI News Portal - 2026-06</h1>
+      <p>2026-06 のニュースアーカイブ</p>
+      <nav><a href="/hiroki/ainews.html">最新へ戻る</a> <a href="/hiroki/archive/index.html">アーカイブ一覧</a></nav>
+    </div>
+    <button id="themeToggle" type="button" aria-label="表示テーマ切り替え">🌓 テーマ</button>
+  </header>
+  
+  <div class="controls">
+    <input id="searchBox" type="search" placeholder="キーワードで検索…">
+    <select id="sortSelect">
+      <option value="date">新着順</option>
+      <option value="importance">重要度順</option>
+    </select>
+  </div>
+  <div class="chips"><div class="chip active" data-category="all">すべて</div><div class="chip" data-category="general">総合</div><div class="chip" data-category="research">研究・論文</div><div class="chip" data-category="product">製品・サービス</div><div class="chip" data-category="business">ビジネス・投資</div><div class="chip" data-category="policy">政策・規制</div><div class="chip" data-category="opensource">オープンソース</div></div>
+  <div id="count"></div>
+  <div id="newsList"></div>
+  <div id="empty">該当する記事が見つかりませんでした</div>
+  
+</div>
+<script id="news-data" type="application/json">[{"id":"d8346b54546ba927","title":"Claude Science is Anthropic’s newest flagship product","url":"https://www.technologyreview.com/2026/06/30/1139987/claude-science-is-anthropics-newest-flagship-product","sourceName":"MIT Technology Review (AI)","publishedAt":"2026-06-30T21:50:04.000Z","category":"research","importance":5,"summary":"At an event for pharmaceutical executives, biotech founders, and researchers on Tuesday, Anthropic announced Claude Science, a major new product intended to support scientific research in the same wa…"},{"id":"dd070b5aeaf870de","title":"Google’s NotebookLM can sum up your research in a TikTok-style clip","url":"https://www.theverge.com/tech/959778/google-notebooklm-ai-clips","sourceName":"The Verge (AI)","publishedAt":"2026-06-30T19:24:51.000Z","category":"research","importance":3,"summary":"Google's NotebookLM is adding a new way to catch up on your notes: TikTok-style AI videos. The new feature is rolling out to Google AI Ultra and Pro subscribers, allowing NotebookLM to generate 60-se…"},{"id":"d2b47e5ca2b10e4d","title":"ScarfBench: Benchmarking AI Agents for Enterprise Java Framework Migration","url":"https://huggingface.co/blog/ibm-research/scarfbench","sourceName":"Hugging Face Blog","publishedAt":"2026-06-30T18:32:50.000Z","category":"research","importance":4,"summary":""},{"id":"b9b64ef9482c360a","title":"Netflix is using an AI-generated Gene Wilder voice in its Willy Wonka reality show","url":"https://www.theverge.com/streaming/959684/netflix-wonka-golden-ticket-gene-wilder","sourceName":"The Verge (AI)","publishedAt":"2026-06-30T17:19:15.000Z","category":"general","importance":3,"summary":"A new teaser trailer confirmed that Wonka's The Golden Ticket will premiere on Netflix on September 23rd, following its Squid Game reality show in the trend of creating real competitions based on fic…"},{"id":"8cc1837ba6892f6f","title":"Start building with Nano Banana 2 Lite and Gemini Omni Flash","url":"https://deepmind.google/blog/start-building-with-nano-banana-2-lite-and-gemini-omni-flash","sourceName":"Google DeepMind Blog","publishedAt":"2026-06-30T16:02:40.000Z","category":"general","importance":5,"summary":""},{"id":"a8dba2229a7af2bc","title":"Libby will filter out AI content, kind of","url":"https://www.theverge.com/column/959433/libby-ai-filter","sourceName":"The Verge (AI)","publishedAt":"2026-06-30T15:30:00.000Z","category":"general","importance":3,"summary":"This is Lowpass by Janko Roettgers, a newsletter on the ever-evolving intersection of tech and entertainment, syndicated just for The Verge subscribers once a week. \"AI is the new frontier for us,\" s…"},{"id":"9f340727232d898a","title":"Why Specialization Is Inevitable","url":"https://huggingface.co/blog/Dharma-AI/why-specialization-is-inevitable","sourceName":"Hugging Face Blog","publishedAt":"2026-06-30T14:39:11.000Z","category":"general","importance":4,"summary":""},{"id":"f5f85f8182fa0619","title":"Agriculture is ready for AI, but its data isn’t","url":"https://www.technologyreview.com/2026/06/30/1139513/agriculture-is-ready-for-ai-but-its-data-isnt","sourceName":"MIT Technology Review (AI)","publishedAt":"2026-06-30T12:00:00.000Z","category":"research","importance":4,"summary":"Artificial intelligence is transforming what is possible in agriculture, but industry leaders should be wary of investing in AI without first laying the groundwork. The use cases are promising, espec…"},{"id":"a7ac400f51a38c30","title":"Meet the lawyer who beat Elon Musk — twice","url":"https://www.theverge.com/column/959270/elon-musk-open-ai-bill-savitt-twitter","sourceName":"The Verge (AI)","publishedAt":"2026-06-30T12:00:00.000Z","category":"policy","importance":3,"summary":"Watching Elon Musk fulminate at Bill Savitt during Musk v. Altman - the case in which Musk sued Sam Altman and OpenAI instead of seeing a therapist about his AI failures - was a bit like watching a t…"},{"id":"068c9bc43551fee5","title":"How ChatGPT adoption has expanded","url":"https://openai.com/index/how-chatgpt-adoption-has-expanded","sourceName":"OpenAI News","publishedAt":"2026-06-30T09:00:00.000Z","category":"general","importance":5,"summary":"New OpenAI Signals data shows how ChatGPT adoption is growing globally, with users increasing usage, exploring more capabilities, and driving growth across regions and languages."},{"id":"5318e0ba4dd3f11c","title":"Unlocking Britain’s next era of productivity: Building a nation of AI trailblazers","url":"https://blog.google/company-news/inside-google/around-the-globe/google-europe/united-kingdom/unlocking-britains-next-era-of-productivity-building-a-nation-of-ai-trailblazers","sourceName":"Google AI Blog","publishedAt":"2026-06-30T06:00:00.000Z","category":"general","importance":5,"summary":"Google UK shares its latest Economic Impact Report and how to enable more people to unlock the benefits of AI-powered technologies."},{"id":"617f45738c65d6ba","title":"Inside Genebench-Pro","url":"https://openai.com/index/genebench-pro/case-studies","sourceName":"OpenAI News","publishedAt":"2026-06-30T00:00:00.000Z","category":"general","importance":5,"summary":""},{"id":"0b8dc2473cab870c","title":"Introducing GeneBench-Pro","url":"https://openai.com/index/introducing-genebench-pro","sourceName":"OpenAI News","publishedAt":"2026-06-30T00:00:00.000Z","category":"research","importance":5,"summary":"Introducing GeneBench-Pro, a new benchmark testing AI performance in genomics, biology, and scientific research using complex, real-world datasets."},{"id":"f1f7d4f8001b4288","title":"Core dump epidemiology: fixing an 18-year-old bug","url":"https://openai.com/index/core-dump-epidemiology-data-infrastructure-bug","sourceName":"OpenAI News","publishedAt":"2026-06-30T00:00:00.000Z","category":"general","importance":5,"summary":"OpenAI engineers used large-scale core dump analysis to debug rare infrastructure crashes, uncovering both a hardware fault and a long-standing software bug."},{"id":"326b5d51b877e9cf","title":"Featuring Every Eval Ever Results on Hugging Face Model Pages","url":"https://huggingface.co/blog/eee-community-evals","sourceName":"Hugging Face Blog","publishedAt":"2026-06-30T00:00:00.000Z","category":"general","importance":4,"summary":""},{"id":"024d61b386342a9f","title":"Tidal won’t pay royalties on AI-generated music, but isn’t banning it outright","url":"https://www.theverge.com/tech/959211/tidal-ai-music-policy-demonetizingdetect-label","sourceName":"The Verge (AI)","publishedAt":"2026-06-29T19:47:35.000Z","category":"general","importance":3,"summary":"Tidal shared its new policies regarding AI-generated music today and how the platform plans to \"protect artists\" and \"inform listeners.\" Instead of banning it outright, starting on July 15th Tidal wi…"},{"id":"9cc3b14e3b9c7b80","title":"DiScoFormer: One transformer for density and score, across distributions","url":"https://huggingface.co/blog/allenai/discoformer","sourceName":"Hugging Face Blog","publishedAt":"2026-06-29T18:02:48.000Z","category":"general","importance":4,"summary":""},{"id":"a540a6bd4cd2ded3","title":"AI agents are not your “coworkers”","url":"https://www.technologyreview.com/2026/06/29/1139849/ai-agents-are-not-your-coworkers","sourceName":"MIT Technology Review (AI)","publishedAt":"2026-06-29T18:00:00.000Z","category":"general","importance":5,"summary":"This story originally appeared in The Algorithm, our weekly newsletter on AI. To get stories like this in your inbox first, sign up here. Imagine coming in to work to learn that a new underling will …"},{"id":"e0616775a3b94cd0","title":"Ask an AI expert: What exactly is the full stack?","url":"https://blog.google/innovation-and-ai/technology/ai/full-stack-ai-explainer","sourceName":"Google AI Blog","publishedAt":"2026-06-29T16:00:00.000Z","category":"general","importance":5,"summary":"A Google expert explains what it means to take a full-stack approach to AI and why it’s been the foundation of our AI work for so long."},{"id":"2acbef45cc23af11","title":"Agent confidence on the technical frontier","url":"https://www.technologyreview.com/2026/06/29/1139635/agent-confidence-on-the-technical-frontier","sourceName":"MIT Technology Review (AI)","publishedAt":"2026-06-29T14:44:01.000Z","category":"business","importance":4,"summary":"Enterprise investment in AI is booming. Gartner is calling 2026 an “inflection year” for organizations to align their AI projects with strategic business objectives. As the pressure to prove ROI moun…"},{"id":"247324a6d137edef","title":"Mapping Europe’s AI Workforce Opportunity","url":"https://openai.com/index/mapping-ai-jobs-transition-eu","sourceName":"OpenAI News","publishedAt":"2026-06-29T07:00:00.000Z","category":"general","importance":5,"summary":"A new OpenAI report maps how AI could reshape jobs across the EU, highlighting which occupations may face automation, growth, or workflow changes."},{"id":"5f8ae94d3d52ae74","title":"HP Inc. launches Frontier strategic partnership with OpenAI","url":"https://openai.com/index/hp-frontier-partnership","sourceName":"OpenAI News","publishedAt":"2026-06-28T17:00:00.000Z","category":"product","importance":5,"summary":"HP Inc. scales its OpenAI Frontier partnership to deploy AI across customer experiences, software development, and enterprise operations."},{"id":"30f48121decc708b","title":"Previewing GPT-5.6 Sol: a next-generation model","url":"https://openai.com/index/previewing-gpt-5-6-sol","sourceName":"OpenAI News","publishedAt":"2026-06-26T10:00:00.000Z","category":"general","importance":5,"summary":"OpenAI previews GPT-5.6 Sol, a next-generation model with stronger capabilities in coding, science, and cybersecurity, paired with its most advanced safety stack."},{"id":"5d2de9152522b89c","title":"Run a vLLM Server on HF Jobs in One Command","url":"https://huggingface.co/blog/vllm-jobs","sourceName":"Hugging Face Blog","publishedAt":"2026-06-26T00:00:00.000Z","category":"general","importance":4,"summary":""},{"id":"823e02f8667ea9dc","title":"Our latest Google Finance upgrades, including a new app","url":"https://blog.google/products-and-platforms/products/search/google-finance-updates-june-2026","sourceName":"Google AI Blog","publishedAt":"2026-06-25T16:00:00.000Z","category":"product","importance":5,"summary":"The new Google Finance is coming out of beta and launching a new Android app."},{"id":"db0599e11fe83e28","title":"Repositioning retail for the AI era","url":"https://www.technologyreview.com/2026/06/25/1137848/repositioning-retail-for-the-ai-era","sourceName":"MIT Technology Review (AI)","publishedAt":"2026-06-25T14:22:59.000Z","category":"general","importance":4,"summary":"Artificial intelligence is rapidly reshaping retail, but not in the ways consumers might immediately notice. The biggest transformation may not be flashy virtual try-ons or chatbot shopping assistant…"},{"id":"3d99cf87d464b7af","title":"How agents are transforming work","url":"https://openai.com/index/how-agents-are-transforming-work","sourceName":"OpenAI News","publishedAt":"2026-06-25T02:00:00.000Z","category":"research","importance":5,"summary":"A new OpenAI research paper shows how AI agents are transforming work, enabling longer, more complex tasks and expanding productivity across roles."},{"id":"72286a4388d15b6d","title":"Introducing computer use in Gemini 3.5 Flash","url":"https://deepmind.google/blog/introducing-computer-use-in-gemini-3-5-flash","sourceName":"Google DeepMind Blog","publishedAt":"2026-06-24T16:30:01.000Z","category":"product","importance":5,"summary":""},{"id":"ad312ce435987076","title":"Accelerating Transformers Fine-Tuning with NVIDIA NeMo AutoModel","url":"https://huggingface.co/blog/nvidia/accelerating-fine-tuning-nvidia-nemo-automodel","sourceName":"Hugging Face Blog","publishedAt":"2026-06-24T16:00:13.000Z","category":"general","importance":4,"summary":""},{"id":"f843854428a425b4","title":"The emergence of the web data infrastructure layer for AI","url":"https://www.technologyreview.com/2026/06/24/1139202/the-emergence-of-the-web-data-infrastructure-layer-for-ai","sourceName":"MIT Technology Review (AI)","publishedAt":"2026-06-24T11:59:54.000Z","category":"general","importance":4,"summary":"AI is booming. New use cases are emerging each day. To capitalize on the technology’s potential, enterprises require data at scale. In many cases, though, the relevant information is blocked or unstr…"},{"id":"855db08b75f6ecde","title":"OpenAI and Broadcom unveil LLM-optimized inference chip","url":"https://openai.com/index/openai-broadcom-jalapeno-inference-chip","sourceName":"OpenAI News","publishedAt":"2026-06-24T06:00:00.000Z","category":"general","importance":5,"summary":"OpenAI and Broadcom introduce Jalapeño, a custom AI chip built for LLM inference to improve performance, efficiency, and scale across AI systems."},{"id":"bb6dca4045d63cf1","title":"Introducing the FFASR Leaderboard: Benchmarking ASR in the Real World","url":"https://huggingface.co/blog/ffasr-leaderboard","sourceName":"Hugging Face Blog","publishedAt":"2026-06-24T00:00:00.000Z","category":"research","importance":4,"summary":""},{"id":"072c0c3973379946","title":"How GPT-5 helped immunologist Derya Unutmaz solve a 3-year-old mystery","url":"https://openai.com/index/gpt-5-immunology-mystery","sourceName":"OpenAI News","publishedAt":"2026-06-23T17:00:00.000Z","category":"research","importance":5,"summary":"GPT-5 Pro helped solve a 3-year-old immunology mystery, offering insights into T cell behavior. The breakthrough could support cancer and autoimmune research."},{"id":"aec47bf765565a42","title":"Helping build shared standards for advanced AI","url":"https://openai.com/index/helping-build-shared-standards-for-advanced-ai","sourceName":"OpenAI News","publishedAt":"2026-06-23T13:00:00.000Z","category":"business","importance":5,"summary":"OpenAI helps build shared standards for advanced AI, supporting evaluation frameworks, safety practices, and global cooperation through the Appia Foundation."},{"id":"659dde926b1b6b45","title":"The $400 million machine powering the future of chipmaking","url":"https://www.technologyreview.com/2026/06/23/1138837/asml-400-million-dollar-machine-powering-future-of-chipmaking","sourceName":"MIT Technology Review (AI)","publishedAt":"2026-06-23T09:00:00.000Z","category":"general","importance":5,"summary":"Jos Benschop is climbing a ladder to get to the top of his newest machine. It’s a bit of a schlep. The contraption is the size of a double-decker bus—more than 150 tons of gleaming precision-milled a…"},{"id":"480508a9ca16ad81","title":"How Omio is building the future of conversational travel","url":"https://openai.com/index/omio","sourceName":"OpenAI News","publishedAt":"2026-06-23T00:00:00.000Z","category":"general","importance":5,"summary":"Discover how Omio uses OpenAI to power conversational travel experiences, accelerate product development, and transform into an AI-native company."},{"id":"b0d7df1028b033f7","title":"Shipping huggingface_hub every week with AI, open tools, and a human in the loop","url":"https://huggingface.co/blog/huggingface-hub-release-ci","sourceName":"Hugging Face Blog","publishedAt":"2026-06-23T00:00:00.000Z","category":"general","importance":4,"summary":""},{"id":"2e297cf400e7d42e","title":"Experimenting with the proposed Cross-Origin Storage API in Transformers.js","url":"https://huggingface.co/blog/cross-origin-storage","sourceName":"Hugging Face Blog","publishedAt":"2026-06-23T00:00:00.000Z","category":"general","importance":4,"summary":""},{"id":"b497f30634e434d9","title":"PP-OCRv6 on Hugging Face: 50-Language OCR from 1.5M to 34.5M Parameters","url":"https://huggingface.co/blog/PaddlePaddle/pp-ocrv6","sourceName":"Hugging Face Blog","publishedAt":"2026-06-22T13:18:56.000Z","category":"general","importance":4,"summary":""},{"id":"3696e67c2c9e8aaa","title":"Patch the Planet: a Daybreak initiative to support open source maintainers","url":"https://openai.com/index/patch-the-planet","sourceName":"OpenAI News","publishedAt":"2026-06-22T10:00:00.000Z","category":"opensource","importance":5,"summary":"OpenAI introduces Patch the Planet, a Daybreak initiative helping open-source maintainers find, validate, and fix vulnerabilities with AI and expert review."},{"id":"b63e5cb33bb0ec81","title":"Daybreak: Tools for securing every organization in the world","url":"https://openai.com/index/daybreak-securing-the-world","sourceName":"OpenAI News","publishedAt":"2026-06-22T10:00:00.000Z","category":"general","importance":5,"summary":"OpenAI introduces new Daybreak tools, including Codex Security and GPT-5.5-Cyber, to help organizations find, validate, and patch vulnerabilities at scale."},{"id":"e2330fefe7e28987","title":"Codex-maxxing for long-running work","url":"https://openai.com/index/codex-maxxing-long-running-work","sourceName":"OpenAI News","publishedAt":"2026-06-22T00:00:00.000Z","category":"general","importance":5,"summary":"Learn how Jason Liu uses Codex to preserve context, manage complex projects, and help work continue beyond a single prompt."},{"id":"965bb4d2ca17efb5","title":"We got local models to triage the OpenClaw repo for FREE!*","url":"https://huggingface.co/blog/local-models-pr-triage","sourceName":"Hugging Face Blog","publishedAt":"2026-06-22T00:00:00.000Z","category":"policy","importance":4,"summary":""},{"id":"4a975b89e4a0f0fb","title":"Samsung Electronics brings ChatGPT and Codex to employees","url":"https://openai.com/index/samsung-electronics-chatgpt-codex-deployment","sourceName":"OpenAI News","publishedAt":"2026-06-21T23:00:00.000Z","category":"general","importance":5,"summary":"Samsung Electronics deploys ChatGPT Enterprise and Codex to employees worldwide, marking one of OpenAI’s largest enterprise AI rollouts."}]</script>
+<script id="category-labels" type="application/json">{"general":"総合","research":"研究・論文","product":"製品・サービス","business":"ビジネス・投資","policy":"政策・規制","opensource":"オープンソース"}</script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var saved = localStorage.getItem('ainews_theme');
+  if (saved) root.setAttribute('data-theme', saved);
+  document.getElementById('themeToggle').addEventListener('click', function () {
+    var current = root.getAttribute('data-theme')
+      || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var next = current === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('ainews_theme', next);
+  });
+
+  var listEl = document.getElementById('newsList');
+  if (!listEl) return;
+
+  var items = JSON.parse(document.getElementById('news-data').textContent);
+  var labels = JSON.parse(document.getElementById('category-labels').textContent);
+  var searchBox = document.getElementById('searchBox');
+  var sortSelect = document.getElementById('sortSelect');
+  var chips = document.querySelectorAll('.chip');
+  var countEl = document.getElementById('count');
+  var emptyEl = document.getElementById('empty');
+  var activeCategory = 'all';
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function stars(n) {
+    return '★'.repeat(n) + '☆'.repeat(5 - n);
+  }
+
+  function render() {
+    var q = searchBox.value.trim().toLowerCase();
+    var sort = sortSelect.value;
+    var filtered = items.filter(function (it) {
+      if (activeCategory !== 'all' && it.category !== activeCategory) return false;
+      if (!q) return true;
+      return (it.title + ' ' + it.summary + ' ' + it.sourceName).toLowerCase().indexOf(q) !== -1;
+    });
+    filtered.sort(function (a, b) {
+      if (sort === 'importance') return b.importance - a.importance || b.publishedAt.localeCompare(a.publishedAt);
+      return b.publishedAt.localeCompare(a.publishedAt);
+    });
+
+    listEl.innerHTML = filtered.map(function (it) {
+      var d = new Date(it.publishedAt);
+      var dateStr = isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
+      return '<a class="card" href="' + escapeHtml(it.url) + '" target="_blank" rel="noopener noreferrer">' +
+        '<div class="meta">' +
+          '<span class="badge">' + escapeHtml(labels[it.category] || it.category) + '</span>' +
+          '<span class="stars">' + stars(it.importance) + '</span>' +
+          '<span>' + escapeHtml(it.sourceName) + '</span>' +
+          '<span>' + dateStr + '</span>' +
+        '</div>' +
+        '<h3>' + escapeHtml(it.title) + '</h3>' +
+        '<p>' + escapeHtml(it.summary) + '</p>' +
+      '</a>';
+    }).join('');
+
+    countEl.textContent = filtered.length + ' 件';
+    emptyEl.style.display = filtered.length === 0 ? 'block' : 'none';
+  }
+
+  searchBox.addEventListener('input', render);
+  sortSelect.addEventListener('change', render);
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      chips.forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      activeCategory = chip.dataset.category;
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
