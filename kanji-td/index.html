@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#12141f">
+<title>漢字タワーディフェンス - かんじの塔</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== ホーム画面 ===== -->
+  <div id="screen-home" class="screen"></div>
+
+  <!-- ===== ゲーム画面 ===== -->
+  <div id="screen-game" class="screen hidden">
+    <div id="hud-top">
+      <button id="btn-quit" class="hud-btn" title="やめる">🏠</button>
+      <div class="hud-stat" id="hud-life" title="きょてんHP">❤️ <span>20</span></div>
+      <div class="hud-stat" id="hud-coin" title="コイン">🪙 <span>0</span></div>
+      <div class="hud-stat" id="hud-wave" title="ウェーブ">🌊 <span>1/8</span></div>
+      <div class="hud-combo" id="hud-combo"><span class="combo-num">0</span><span class="combo-label">COMBO</span></div>
+      <div class="hud-right">
+        <button id="btn-speed" class="hud-btn" title="はやさ">▶ x1</button>
+        <button id="btn-pause" class="hud-btn" title="いちじていし">⏸</button>
+      </div>
+    </div>
+
+    <div id="canvas-wrap">
+      <canvas id="game-canvas"></canvas>
+      <div id="wave-banner" class="hidden"></div>
+      <div id="combo-banner" class="hidden"></div>
+      <!-- タワー操作ポップアップ（canvas-wrap基準で配置） -->
+      <div id="tower-popup" class="hidden"></div>
+    </div>
+
+    <div id="hud-bottom">
+      <div id="tower-palette"></div>
+      <div id="skill-area">
+        <div id="skill-gauge"><div id="skill-gauge-fill"></div><span id="skill-gauge-label">スキル</span></div>
+        <button id="btn-skill" class="big-btn skill-btn" disabled>✨ スキル</button>
+        <button id="btn-next-wave" class="big-btn wave-btn hidden">⚔️ つぎのウェーブ</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== モーダル（クイズ・結果・図鑑など） ===== -->
+  <div id="modal-layer" class="hidden"></div>
+
+</div>
+
+<!-- データ -->
+<script src="js/data/questions-data.js"></script>
+<script src="js/data/towers.js"></script>
+<script src="js/data/enemies.js"></script>
+<script src="js/data/skills.js"></script>
+<script src="js/data/stages.js"></script>
+<script src="js/data/meta.js"></script>
+<!-- コア -->
+<script src="js/core/save.js"></script>
+<script src="js/core/sfx.js"></script>
+<script src="js/core/quiz.js"></script>
+<!-- ゲーム本体 -->
+<script src="js/game/effects.js"></script>
+<script src="js/game/entities.js"></script>
+<script src="js/game/game.js"></script>
+<!-- UI -->
+<script src="js/ui/screens.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
