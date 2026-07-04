@@ -138,34 +138,6 @@
   }
   .grade-card:hover .arrow { transform: translateX(4px); color: var(--accent); }
 
-  .drill-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 14px;
-  }
-  .drill-card {
-    display: block;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 18px;
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.15s, border-color 0.15s;
-  }
-  .drill-card:hover { transform: translateY(-2px); border-color: var(--accent2); }
-  .drill-card .name {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text3);
-    display: flex; align-items: center; gap: 6px;
-    margin-bottom: 4px;
-  }
-  .drill-card .desc {
-    font-size: 0.78rem;
-    color: var(--text2);
-  }
-
   footer {
     text-align: center;
     padding: 24px 0;
@@ -211,16 +183,6 @@
         <div class="count">202字 ・ カード＋書き取り＋クイズ</div>
         <div class="grade-progress-bar"><div class="grade-progress-fill" id="fill4" style="width:0%"></div></div>
         <div class="grade-progress-label" id="label4">0 / 202</div>
-      </a>
-    </div>
-  </section>
-
-  <section>
-    <div class="section-title">✏️ 2年生の ドリルで ちからだめし</div>
-    <div class="drill-grid">
-      <a class="drill-card" href="drill.html">
-        <div class="name">📝 かんじドリル（10問）</div>
-        <div class="desc">よみがなを こたえる きほんドリル</div>
       </a>
     </div>
   </section>
