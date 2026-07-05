@@ -1,1 +1,0 @@
-# hirokitsuzuki-sketch.github.io
