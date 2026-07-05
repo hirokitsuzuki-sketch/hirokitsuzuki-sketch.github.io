@@ -82,6 +82,7 @@ const Game = {
     this.hideTowerPopup();
 
     document.getElementById("btn-speed").textContent = "▶ x1";
+    BGM.play("battle");
     this.resize();
     this.updateHUD();
 
@@ -255,7 +256,7 @@ const Game = {
 
     const hasBoss = wave.some(g => ENEMIES[g.t].boss);
     this.showWaveBanner(hasBoss ? "👹 ボスウェーブ！" : `ウェーブ ${this.waveIdx + 1}`, hasBoss);
-    if (hasBoss) { SFX.bossRoar(); FX.shake(10); }
+    if (hasBoss) { SFX.bossRoar(); FX.shake(10); BGM.play("boss"); }
   },
 
   spawnEnemy(typeId) {
@@ -278,6 +279,8 @@ const Game = {
     this.gainCoins(bonus, this.pathPx[this.pathPx.length - 2]);
     this.waveState = "ready";
     this.waveCountdown = 6;
+    // ボス曲から通常曲に戻す
+    if (BGM.current === "boss") BGM.play("battle");
   },
 
   // 「つぎのウェーブ」を早く呼ぶ（残り秒数×5コインのボーナス）
@@ -681,6 +684,7 @@ const Game = {
     if (!this.running) return;
     this.stop();
     this.hideTowerPopup();
+    BGM.stop(); // ファンファーレ／敗北音を聞かせる
     if (win) SFX.fanfare(); else SFX.lose();
 
     const s = this.session;

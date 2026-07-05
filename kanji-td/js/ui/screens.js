@@ -12,6 +12,7 @@ const Screens = {
     document.getElementById("screen-game").classList.add("hidden");
     const home = document.getElementById("screen-home");
     home.classList.remove("hidden");
+    BGM.play("home");
 
     const d = SaveMgr.data;
     SaveMgr.refreshDaily();
@@ -81,7 +82,8 @@ const Screens = {
           <button class="menu-btn" id="menu-ach"><span class="m-icon">🏆</span>実績<span class="m-badge">${achCount}/${ACHIEVEMENTS.length}</span></button>
           <button class="menu-btn" id="menu-mission"><span class="m-icon">📜</span>ミッション</button>
           <button class="menu-btn" id="menu-howto"><span class="m-icon">❓</span>あそびかた</button>
-          <button class="menu-btn" id="menu-sound"><span class="m-icon">${d.settings.sound ? "🔊" : "🔇"}</span>おと ${d.settings.sound ? "ON" : "OFF"}</button>
+          <button class="menu-btn" id="menu-sound"><span class="m-icon">${d.settings.sound ? "🔊" : "🔇"}</span>こうかおん ${d.settings.sound ? "ON" : "OFF"}</button>
+          <button class="menu-btn" id="menu-bgm"><span class="m-icon">${d.settings.bgm !== false ? "🎵" : "🚫"}</span>BGM ${d.settings.bgm !== false ? "ON" : "OFF"}</button>
           <button class="menu-btn" id="menu-reset"><span class="m-icon">🗑️</span>データけす</button>
         </div>
 
@@ -108,6 +110,7 @@ const Screens = {
     document.getElementById("menu-mission").addEventListener("click", () => this.showMissions());
     document.getElementById("menu-howto").addEventListener("click", () => this.showHowto());
     document.getElementById("menu-sound").addEventListener("click", () => { SFX.toggle(); this.showHome(); });
+    document.getElementById("menu-bgm").addEventListener("click", () => { BGM.toggle(); this.showHome(); });
     document.getElementById("menu-reset").addEventListener("click", () => {
       this.confirm("ほんとうに データを ぜんぶ けしますか？", () => {
         SaveMgr.reset();
