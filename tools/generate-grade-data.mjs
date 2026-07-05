@@ -93,5 +93,31 @@ for (const grade of GRADES) {
   console.log(`survivor grade${grade}: ${questions.length}問 -> ${outPath.pathname}`);
 }
 
+// ---------- 3. kanji-td の 2〜4年カード補完 ----------
+// 手書きの QDATA["2".."4"].kanji は部分的（66〜70字）なので、
+// ドリル用マスターデータから不足分を {k,y,m,b:null,s:null} で push して全字カバーにする。
+// 既存の手書きカード（部首・画数つき）はそのまま生かす。
+{
+  const qsrc = readFileSync(new URL("../kanji-td/js/data/questions-data.js", import.meta.url), "utf8");
+  let qex = {};
+  const qctx = { __export: (o) => { qex = o; } };
+  vm.createContext(qctx);
+  vm.runInContext(qsrc + "\n;__export({QDATA});", qctx);
+
+  tdOut += "\n// --- 2〜4年生の不足カード補完（ドリル用マスターデータ由来） ---\n";
+  for (const grade of ["2", "3", "4"]) {
+    const existing = new Set(qex.QDATA[grade].kanji.map(e => e.k));
+    const master = loadGrade(grade);
+    const missing = Object.entries(master)
+      .filter(([k]) => !existing.has(k))
+      .map(([k, [yomi, imi]]) => ({ k, y: yomi.split("・"), m: imi }));
+    const lines = missing.map(e =>
+      `  { k: ${JSON.stringify(e.k)}, y: ${JSON.stringify(e.y)}, m: ${JSON.stringify(e.m)}, b: null, s: null }`
+    ).join(",\n");
+    tdOut += `QDATA[${JSON.stringify(grade)}].kanji.push(\n${lines}\n);\n`;
+    console.log(`kanji-td grade${grade}: 既存${existing.size}字 + 補完${missing.length}字 = ${existing.size + missing.length}字`);
+  }
+}
+
 writeFileSync(new URL("../kanji-td/js/data/questions-data-extra.js", import.meta.url), tdOut);
 console.log("kanji-td: questions-data-extra.js を生成");
