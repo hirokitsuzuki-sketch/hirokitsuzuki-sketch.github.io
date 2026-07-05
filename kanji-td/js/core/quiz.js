@@ -35,7 +35,7 @@ const Quiz = {
 
   // 設定から出題学年のプールを決める
   gradePool(grade) {
-    if (grade === "mix") return ["2", "3", "4"];
+    if (grade === "mix") return Object.keys(QDATA);
     return [grade];
   },
 

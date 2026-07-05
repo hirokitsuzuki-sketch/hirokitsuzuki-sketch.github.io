@@ -180,6 +180,14 @@
   <section>
     <div class="section-title">📚 がくねんべつ かんじマスター</div>
     <div class="grade-grid" id="gradeGrid">
+      <a class="grade-card" href="grade1.html">
+        <span class="arrow">→</span>
+        <span class="emoji">🍀</span>
+        <h3>1年生</h3>
+        <div class="count">80字 ・ カード＋書き取り＋クイズ</div>
+        <div class="grade-progress-bar"><div class="grade-progress-fill" id="fill1" style="width:0%"></div></div>
+        <div class="grade-progress-label" id="label1">0 / 80</div>
+      </a>
       <a class="grade-card" href="grade2.html">
         <span class="arrow">→</span>
         <span class="emoji">🌱</span>
@@ -203,6 +211,22 @@
         <div class="count">202字 ・ カード＋書き取り＋クイズ</div>
         <div class="grade-progress-bar"><div class="grade-progress-fill" id="fill4" style="width:0%"></div></div>
         <div class="grade-progress-label" id="label4">0 / 202</div>
+      </a>
+      <a class="grade-card" href="grade5.html">
+        <span class="arrow">→</span>
+        <span class="emoji">🌲</span>
+        <h3>5年生</h3>
+        <div class="count">193字 ・ カード＋書き取り＋クイズ</div>
+        <div class="grade-progress-bar"><div class="grade-progress-fill" id="fill5" style="width:0%"></div></div>
+        <div class="grade-progress-label" id="label5">0 / 193</div>
+      </a>
+      <a class="grade-card" href="grade6.html">
+        <span class="arrow">→</span>
+        <span class="emoji">🎓</span>
+        <h3>6年生</h3>
+        <div class="count">191字 ・ カード＋書き取り＋クイズ</div>
+        <div class="grade-progress-bar"><div class="grade-progress-fill" id="fill6" style="width:0%"></div></div>
+        <div class="grade-progress-label" id="label6">0 / 191</div>
       </a>
     </div>
   </section>
@@ -229,9 +253,12 @@ function applyProgress(id, learned, total) {
   document.getElementById('label' + id).textContent = learned + ' / ' + total;
 }
 
+applyProgress(1, loadLearnedCount('kanji1_state'), 80);
 applyProgress(2, loadLearnedCount('kanji_state'), 160);
 applyProgress(3, loadLearnedCount('kanji3_state'), 200);
 applyProgress(4, loadLearnedCount('kanji4_state'), 202);
+applyProgress(5, loadLearnedCount('kanji5_state'), 193);
+applyProgress(6, loadLearnedCount('kanji6_state'), 191);
 </script>
 
 </body>

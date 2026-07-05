@@ -49,7 +49,7 @@ const Screens = {
 
         <div class="section-h">📚 もんだいの がくねん</div>
         <div class="grade-select">
-          ${["2", "3", "4", "mix"].map(g => `
+          ${["1", "2", "3", "4", "5", "6", "mix"].map(g => `
             <button class="grade-chip ${d.settings.grade === g ? "active" : ""}" data-grade="${g}">
               ${g === "mix" ? "🌈 ミックス" : g + "年生"}
             </button>
@@ -201,7 +201,7 @@ const Screens = {
       <div class="modal-box">
         <h2>📖 かんじ図鑑</h2>
         <div class="zukan-tabs">
-          ${["2", "3", "4"].map(g => `<button class="zukan-tab ${g === tab ? "active" : ""}" data-tab="${g}">${g}年生</button>`).join("")}
+          ${["1", "2", "3", "4", "5", "6"].map(g => `<button class="zukan-tab ${g === tab ? "active" : ""}" data-tab="${g}">${g}年生</button>`).join("")}
         </div>
         <div class="zukan-stat">であった ${seen} / マスター（3回せいかい） <span style="color:var(--gold)">${learned}</span> / ぜんぶ ${entries.length}</div>
         <div class="zukan-detail" id="zukan-detail">

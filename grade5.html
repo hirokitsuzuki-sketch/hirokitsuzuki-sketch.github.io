@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>柊くんの漢字マスター｜5年生の193字</title>
+<link rel="stylesheet" href="css/kanji-app.css">
+</head>
+<body>
+<div id="stars"></div>
+<div id="app">
+  <header>
+    <a class="logo" href="index.html" title="トップページに戻る">
+      <div class="logo-icon">字</div>
+      <div>
+        <div class="logo-text">柊くんの漢字マスター</div>
+        <div class="logo-sub">小学5年生・193字</div>
+      </div>
+    </a>
+    <div class="progress-global">
+      <div class="pct" id="globalPct">0%</div>
+      <div class="lbl">全体進捗</div>
+    </div>
+  </header>
+
+  <!-- HOME SCREEN -->
+  <div id="screen-home" class="screen active">
+    <div class="hero">
+      <h1>漢字を文章で<br>マスターしよう！</h1>
+      <p>5年生の193字を、文章問題で正しく書けるようになろう。<br>カテゴリごとに少しずつ進めていこう。</p>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('quiz')">📝 問題練習</button>
+      <button class="tab-btn" onclick="switchTab('list')">📚 漢字一覧</button>
+    </div>
+
+    <!-- Quiz tab -->
+    <div id="tab-quiz">
+      <div class="section-head">カテゴリを選ぼう</div>
+      <div class="cat-grid" id="catGrid"></div>
+    </div>
+
+    <!-- List tab -->
+    <div id="tab-list" style="display:none">
+      <div class="section-head">習った漢字をチェック</div>
+      <div class="kanji-grid" id="kanjiGrid"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="screen-quiz" class="screen">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="goHome()">←</button>
+      <div>
+        <div class="quiz-title" id="quizTitle"></div>
+        <div class="quiz-subtitle" id="quizSubtitle"></div>
+      </div>
+      <div class="quiz-progress">
+        <div class="qnum" id="qNum"></div>
+        <div class="qof" id="qOf"></div>
+      </div>
+    </div>
+    <div class="prog-bar-wrap">
+      <div class="prog-bar" id="progBar" style="width:0%"></div>
+    </div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="modeBtn0" onclick="setMode(0)">📝 紙に書く</button>
+      <button class="mode-btn" id="modeBtn1" onclick="setMode(1)">✏️ 画面に書く</button>
+    </div>
+    <div class="questions-list" id="questionsList"></div>
+    <div class="quiz-actions">
+      <button class="reveal-btn" id="revealBtn" onclick="revealAnswers()">📋 答え合わせ</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="screen-results" class="screen">
+    <div class="results-hero">
+      <div class="results-score" id="resScore"></div>
+      <div class="results-label" id="resLabel"></div>
+      <div class="results-msg" id="resMsg"></div>
+      <div class="results-sub" id="resSub"></div>
+    </div>
+    <div class="results-actions">
+      <button class="res-btn" onclick="goHome()">🏠 ホームへ</button>
+      <button class="res-btn primary" id="retrybtn" onclick="retryQuiz()">🔄 もう一度</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-kanji" id="modalKanji"></div>
+    <div class="modal-read" id="modalRead"></div>
+    <div class="modal-meaning" id="modalMeaning"></div>
+    <div class="modal-examples">
+      <div class="modal-ex-title">使い方の例</div>
+      <div class="modal-ex-item" id="modalEx"></div>
+    </div>
+    <button class="modal-close" onclick="closeModal()">閉じる</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="js/data-grade5.js"></script>
+<script src="js/kanji-app.js"></script>
+</body>
+</html>
