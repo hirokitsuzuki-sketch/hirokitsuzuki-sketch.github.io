@@ -333,10 +333,10 @@ button:disabled { opacity: 0.45; cursor: default; }
 .tower-btn .t-name { font-size: 0.62rem; font-weight: 800; color: var(--text2); }
 .tower-btn .t-cost { font-size: 0.68rem; font-weight: 900; color: var(--gold); }
 .tower-btn.selected {
+  /* 位置は動かさず、色と光だけで選択中を示す */
   border-color: var(--gold);
   background: var(--card2);
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(255, 207, 77, 0.3);
+  box-shadow: 0 0 14px rgba(255, 207, 77, 0.45);
 }
 .tower-btn.poor { opacity: 0.4; }
 
@@ -371,7 +371,17 @@ button:disabled { opacity: 0.45; cursor: default; }
 .skill-btn { background: linear-gradient(135deg, #6d5bd0, #9b59b6); color: #fff; }
 .skill-btn:not(:disabled) { box-shadow: 0 0 16px rgba(167, 139, 250, 0.55); animation: skillPulse 1.2s infinite; }
 @keyframes skillPulse { 50% { box-shadow: 0 0 26px rgba(167, 139, 250, 0.9); } }
-.wave-btn { background: linear-gradient(135deg, #e67e22, #e74c3c); color: #fff; box-shadow: 0 4px 14px rgba(231, 76, 60, 0.4); }
+.wave-btn {
+  background: linear-gradient(135deg, #e67e22, #e74c3c);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(231, 76, 60, 0.4);
+  /* キャンバス右下に固定表示（レイアウトに影響しない） */
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 6;
+  min-width: 190px;
+}
 
 /* タワー操作ポップアップ */
 #tower-popup {
@@ -681,6 +691,7 @@ button:disabled { opacity: 0.45; cursor: default; }
   .hud-stat, .hud-btn { padding: 5px 8px; font-size: 0.8rem; }
   .hud-combo .combo-num { font-size: 1rem; }
   .big-btn { padding: 9px 12px; font-size: 0.78rem; }
+  .wave-btn { min-width: 150px; right: 8px; bottom: 8px; }
   #skill-gauge { width: 60px; }
   .quiz-choices { grid-template-columns: 1fr 1fr; gap: 8px; }
   .quiz-choice { padding: 13px 6px; min-height: 54px; }
