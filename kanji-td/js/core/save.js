@@ -25,7 +25,7 @@ const SaveMgr = {
       ach: {},
       // デイリーチャレンジ
       daily: { date: "", stats: {}, done: false },
-      settings: { grade: "2", sound: true, seenHowto: false },
+      settings: { grade: "2", sound: true, bgm: true, seenHowto: false },
     };
   },
 
