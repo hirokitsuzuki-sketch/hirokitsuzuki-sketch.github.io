@@ -190,7 +190,12 @@ const Screens = {
      かんじ図鑑
      ========================================= */
 
-  showZukan(tab = "2") {
+  showZukan(tab) {
+    // 初期タブは「もんだいの がくねん」設定に合わせる（ミックスは2年生）
+    if (!tab) {
+      const g = SaveMgr.data.settings.grade;
+      tab = QDATA[g] ? g : "2";
+    }
     const layer = document.getElementById("modal-layer");
     layer.classList.remove("hidden");
 

@@ -158,3 +158,16 @@ canvas.writing-canvas{width:100%;height:120px;background:rgba(255,255,255,0.03);
 
 @media(max-width:520px){.cat-grid{grid-template-columns:1fr 1fr}.kanji-grid{grid-template-columns:repeat(auto-fill,minmax(50px,1fr))}.modal-kanji{font-size:60px}}
 @media(max-width:360px){.cat-grid{grid-template-columns:1fr}}
+
+/* サウンドON/OFF（ヘッダー） */
+.sound-controls{display:flex;gap:8px;margin-left:auto;margin-right:14px}
+.sound-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--card);font-size:17px;cursor:pointer;transition:all 0.2s;line-height:1}
+.sound-btn:hover{border-color:var(--accent)}
+.sound-btn.off{opacity:0.45}
+
+/* まちがえた問題だけやりなおすボタン */
+.res-btn.wrong-retry{background:linear-gradient(135deg,var(--accent3),#c44560);color:white;border-color:transparent}
+
+/* おいわいの紙吹雪 */
+.confetti{position:fixed;top:-32px;z-index:300;pointer-events:none;animation:confetti-fall 2.8s linear forwards}
+@keyframes confetti-fall{to{transform:translateY(110vh) rotate(560deg);opacity:0.5}}
