@@ -88,7 +88,9 @@ const Screens = {
         </div>
 
         <div class="home-footer">
-          <a href="../index.html">← かんじラボにもどる</a><br><br>
+          <a href="../index.html">🏠 かんじラボ</a>
+          <a href="../kanji-survivor/index.html">🗡️ 漢字サバイバー</a>
+          <a href="../grade2.html">📚 かんじドリル</a><br><br>
           もんだいに せいかいすると タワーが たてられるよ！れんぞくせいかいで パワーアップ！
         </div>
       </div>

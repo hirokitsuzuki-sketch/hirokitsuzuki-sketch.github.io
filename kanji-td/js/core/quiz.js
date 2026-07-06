@@ -9,6 +9,9 @@
 const Quiz = {
   TIME_LIMIT: 12, // 秒
 
+  // まちがえた問題の復習キュー（35%の確率で優先再出題、最大10件）
+  reviewQueue: [],
+
   // 全学年の漢字 → エントリ の逆引き（図鑑用）
   kanjiMap: {},
 
@@ -60,6 +63,12 @@ const Quiz = {
 
   // 問題を1問生成する。{ typeLabel, text, choices, correctIdx, explain, zukan } を返す
   generate(gradeSetting) {
+    // まちがえた問題を優先して もう一度出す（まちがえた瞬間が一番おぼえるため）
+    if (this.reviewQueue.length > 0 && Math.random() < 0.35) {
+      const q = this.reviewQueue.shift();
+      q.isReview = true;
+      return q;
+    }
     for (let attempt = 0; attempt < 20; attempt++) {
       const grade = this.rand(this.gradePool(gradeSetting));
       const type = this.pickType();
@@ -252,10 +261,12 @@ const Quiz = {
 
       if (correct) {
         SFX.correct();
-        explainEl.innerHTML = `<span class="ok">せいかい！</span> ${q.explain}`;
+        explainEl.innerHTML = `<span class="ok">せいかい！${q.isReview ? " ふくしゅう クリア🎉" : ""}</span> ${q.explain}`;
       } else {
         SFX.wrong();
         explainEl.innerHTML = `<span class="ng">${chosenIdx < 0 ? "じかんぎれ…" : "ざんねん…"}</span> ${q.explain}`;
+        // まちがえた問題は あとで もう一度出す
+        if (this.reviewQueue.length < 10) this.reviewQueue.push(q);
       }
 
       // 図鑑に記録
