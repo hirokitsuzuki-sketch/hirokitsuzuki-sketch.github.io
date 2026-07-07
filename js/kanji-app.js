@@ -109,6 +109,9 @@ function loadState() {
       const p = JSON.parse(s);
       if (p.scores)       state.scores = p.scores;
       if (p.learnedKanji) state.learnedKanji = new Set(p.learnedKanji);
+      if (p.catStars)     state.catStars = p.catStars;
+      if (p.weak)         state.weak = p.weak;
+      if (p.mastery)      state.mastery = p.mastery;
     }
   } catch(e) {}
 }
@@ -117,7 +120,10 @@ function saveState() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       scores: state.scores,
-      learnedKanji: Array.from(state.learnedKanji)
+      learnedKanji: Array.from(state.learnedKanji),
+      catStars: state.catStars,
+      weak: state.weak,
+      mastery: state.mastery
     }));
   } catch(e) {}
 }
@@ -146,9 +152,13 @@ function renderCatGrid() {
     const kanjiInCat=Array.from(new Set(ALL_QUESTIONS.filter(q=>q.cat===cat.id).map(q=>q.ans)));
     const learnedInCat=kanjiInCat.filter(k=>state.learnedKanji.has(k)).length;
     const barW=kanjiInCat.length>0?(learnedInCat/kanjiInCat.length*100):0;
+    const stars=state.catStars[cat.id]||0;
+    const starsHtml=sc.total>0||stars>0
+      ? `<span class="cat-stars">${'⭐'.repeat(stars)}${'<i>☆</i>'.repeat(3-stars)}</span>` : '';
     return `<div class="cat-card ${cat.color}" onclick="startQuiz(${cat.id})">
       <div class="cat-header"><span class="cat-emoji">${cat.emoji}</span>
         <div><div class="cat-name">${cat.name}</div><div class="cat-count">${total}問</div></div>
+        ${starsHtml}
       </div>
       <div class="cat-bar-wrap"><div class="cat-bar" style="width:${barW}%"></div></div>
       <div class="cat-score">
@@ -321,7 +331,13 @@ function markAnswer(i,correct){
   const pct=30+(answeredCount/state.currentQuestions.length)*70;
   document.getElementById('progBar').style.width=pct+'%';
   if(answeredCount===state.currentQuestions.length){
-    state.scores[state.currentCat]={correct:correctCount,total:answeredCount};
+    if(state.currentCat!==null){
+      state.scores[state.currentCat]={correct:correctCount,total:answeredCount};
+      // 星評価（過去ベストを保持）: 100%=⭐3 / 80%=⭐2 / 60%=⭐1
+      const p=Math.round(correctCount/answeredCount*100);
+      const st=p===100?3:p>=80?2:p>=60?1:0;
+      state.catStars[state.currentCat]=Math.max(state.catStars[state.currentCat]||0,st);
+    }
     state.lastWrong=state.wrongList.slice();
     saveState();
     setTimeout(()=>showResults(correctCount,answeredCount),400);
@@ -339,12 +355,30 @@ function showResults(correct,total){
   else{msg='📖 もう少しがんばろう！';sub='まちがえた問題を中心に練習しよう。'}
   document.getElementById('resMsg').textContent=msg;
   document.getElementById('resSub').textContent=sub;
+  renderResultStars(pct);
   if(pct>=80){sfx('fanfare');}else{sfx('cheer');}
   if(pct===100) dropConfetti(40);
   else if(pct>=80) dropConfetti(14);
   updateRetryWrongButton();
   answeredCount=0; correctCount=0;
   showScreen('results'); updateGlobalProgress(); renderCatGrid(); renderKanjiGrid();
+}
+
+// リザルトに星評価を表示（カテゴリ挑戦時のみ）
+function renderResultStars(pct){
+  let el=document.getElementById('resStars');
+  if(!el){
+    el=document.createElement('div');
+    el.id='resStars'; el.className='res-stars';
+    const label=document.getElementById('resLabel');
+    if(!label) return;
+    label.parentNode.insertBefore(el,label.nextSibling);
+  }
+  if(state.currentCat===null){el.style.display='none';return;}
+  el.style.display='';
+  const st=pct===100?3:pct>=80?2:pct>=60?1:0;
+  el.innerHTML='⭐'.repeat(st)+'<i>☆</i>'.repeat(3-st)
+    +(st<3?`<span class="res-stars-hint">${st===2?'100点で ⭐3！':'80点いじょうで ⭐2！'}</span>`:'');
 }
 
 // 「まちがえた問題だけ やりなおす」ボタン（まちがいがある時だけ表示）
