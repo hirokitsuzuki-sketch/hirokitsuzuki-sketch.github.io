@@ -211,3 +211,18 @@ canvas.writing-canvas{width:100%;height:120px;background:rgba(255,255,255,0.03);
 .badge-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);font-size:11px;font-weight:700;color:var(--text2);opacity:0.38}
 .badge-chip.on{opacity:1;border-color:var(--gold);color:var(--text3);background:linear-gradient(135deg,rgba(240,192,64,0.12),var(--card))}
 .badge-chip .b-icon{font-size:14px}
+
+/* べんきょうのきろく（直近7日ミニグラフ） */
+.time-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin:-6px 0 18px;box-shadow:var(--shadow)}
+.tp-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;font-size:12px;font-weight:700;color:var(--text3);margin-bottom:10px}
+.tp-sums{font-size:11px;color:var(--text2);font-weight:600}
+.tp-sums b{color:var(--accent)}
+.tp-chart{display:flex;gap:6px;height:78px}
+.tp-col{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0}
+.tp-val{font-size:9px;color:var(--text2);font-weight:700;height:13px;white-space:nowrap}
+.tp-bar-area{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.tp-bar{width:60%;max-width:26px;background:rgba(79,158,255,0.45);border-radius:4px 4px 0 0;transition:height 0.4s}
+.tp-bar.empty{background:var(--bg3)}
+.tp-col.today .tp-bar{background:linear-gradient(180deg,var(--accent),var(--green))}
+.tp-dow{font-size:10px;color:var(--text2);font-weight:700;margin-top:4px}
+.tp-col.today .tp-dow{color:var(--accent)}

@@ -7,10 +7,102 @@ let state = {
 let answeredCount = 0, correctCount = 0, streak = 0, lastPct = -1;
 
 window.addEventListener('DOMContentLoaded', () => {
-  loadState(); loadDaily(); loadBadges();
-  renderDailyPanel(); renderBadgeRow(); renderCatGrid(); renderKanjiGrid(); updateGlobalProgress();
+  loadState(); loadDaily(); loadBadges(); loadTimeData();
+  renderDailyPanel(); renderBadgeRow(); renderTimePanel();
+  renderCatGrid(); renderKanjiGrid(); updateGlobalProgress();
+  setupTimeTracking();
   if (typeof KSound !== 'undefined') { KSound.init(); setupSoundControls(); }
 });
+
+/* =========================================================
+   勉強時間の記録（全学年共通・localStorage）
+   ---------------------------------------------------------
+   5秒ごとに「画面が見えている ＆ 60秒以内に操作があった」時だけ
+   勉強時間として加算する（開きっぱなしは数えない）。
+   日別に秒数と解いた問題数を保存し、直近7日をグラフ表示。
+   ========================================================= */
+const TIME_KEY = 'kanji_time_v1';
+const TIME_TICK = 5;        // 加算間隔（秒）
+const TIME_IDLE = 60000;    // この時間(ms)操作がなければ休憩とみなす
+const TIME_KEEP_DAYS = 60;  // 保持する日数
+let timeData = null, lastActivity = Date.now();
+
+function loadTimeData() {
+  try { timeData = JSON.parse(localStorage.getItem(TIME_KEY)); } catch (e) { timeData = null; }
+  if (!timeData || typeof timeData !== 'object' || !timeData.days) timeData = { days: {}, total: 0 };
+}
+
+function saveTimeData() {
+  const keys = Object.keys(timeData.days);
+  if (keys.length > TIME_KEEP_DAYS) {
+    keys.sort((a, b) => new Date(a) - new Date(b))
+        .slice(0, keys.length - TIME_KEEP_DAYS)
+        .forEach(k => delete timeData.days[k]);
+  }
+  try { localStorage.setItem(TIME_KEY, JSON.stringify(timeData)); } catch (e) {}
+}
+
+function timeRec(k) { return timeData.days[k] || (timeData.days[k] = { sec: 0, solved: 0 }); }
+
+function fmtTime(sec) {
+  const m = Math.floor(sec / 60);
+  if (m < 60) return m + '分';
+  return Math.floor(m / 60) + '時間' + (m % 60 > 0 ? (m % 60) + '分' : '');
+}
+
+function setupTimeTracking() {
+  ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach(ev =>
+    document.addEventListener(ev, () => { lastActivity = Date.now(); }, { passive: true }));
+  setInterval(() => {
+    if (document.hidden) return;
+    if (Date.now() - lastActivity > TIME_IDLE) return;
+    const r = timeRec(dayKey(new Date()));
+    r.sec += TIME_TICK;
+    timeData.total += TIME_TICK;
+    if (r.sec % 30 === 0) { saveTimeData(); renderTimePanel(); checkBadges(); }
+  }, TIME_TICK * 1000);
+  // 画面を離れる時に保存
+  document.addEventListener('visibilitychange', () => { if (document.hidden) saveTimeData(); });
+  window.addEventListener('pagehide', saveTimeData);
+}
+
+// 「べんきょうのきろく」パネル（直近7日のミニグラフ）
+function renderTimePanel() {
+  let el = document.getElementById('timePanel');
+  if (!el) {
+    const anchor = document.getElementById('badgeRow') || document.getElementById('dailyPanel');
+    if (!anchor) return;
+    el = document.createElement('div');
+    el.id = 'timePanel'; el.className = 'time-panel';
+    anchor.parentNode.insertBefore(el, anchor.nextSibling);
+  }
+  const today = dayKey(new Date());
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 86400000);
+    const k = dayKey(d);
+    const rec = timeData.days[k];
+    days.push({
+      k, dow: '日月火水木金土'[d.getDay()],
+      sec: rec ? rec.sec : 0, solved: rec ? (rec.solved || 0) : 0,
+      isToday: k === today,
+    });
+  }
+  const week = days.reduce((s, d) => s + d.sec, 0);
+  const max = Math.max(300, ...days.map(d => d.sec)); // 最低スケール5分
+  el.innerHTML = `
+    <div class="tp-head"><span>📊 べんきょうのきろく</span>
+      <span class="tp-sums">きょう <b>${fmtTime(days[6].sec)}</b> ・ 7日間 <b>${fmtTime(week)}</b> ・ るいけい <b>${fmtTime(timeData.total)}</b></span>
+    </div>
+    <div class="tp-chart">
+      ${days.map(d => `
+        <div class="tp-col${d.isToday ? ' today' : ''}" title="${d.k}：${fmtTime(d.sec)}・${d.solved}問">
+          <div class="tp-val">${d.isToday ? fmtTime(d.sec) : ''}</div>
+          <div class="tp-bar-area"><div class="tp-bar${d.sec === 0 ? ' empty' : ''}" style="height:${Math.max(4, Math.round(d.sec / max * 100))}%"></div></div>
+          <div class="tp-dow">${d.dow}</div>
+        </div>`).join('')}
+    </div>`;
+}
 
 /* =========================================================
    きょうのもくひょう＋れんぞく日数（全学年共通・localStorage）
@@ -48,6 +140,10 @@ function bumpDaily(correct) {
   }
   daily.solved++;
   if (correct) daily.correct++;
+  // 日別きろく（グラフ用）にも問題数を記録
+  timeRec(today).solved++;
+  saveTimeData();
+  renderTimePanel();
   if (!daily.goalDone && daily.solved >= DAILY_GOAL) {
     daily.goalDone = true;
     setTimeout(() => { showToast('🎯 きょうの もくひょう たっせい！'); sfx('fanfare'); dropConfetti(24); }, 700);
@@ -71,6 +167,8 @@ const BADGES = [
   { id:'m10',     icon:'⭐', name:'10字 マスター',   grade:true, cond:()=>masteredCount()>=10 },
   { id:'half',    icon:'🌗', name:'はんぶん おぼえた', grade:true, cond:()=>learnedRatio()>=0.5 },
   { id:'all',     icon:'👑', name:'ぜんぶ おぼえた',  grade:true, cond:()=>learnedRatio()>=1 },
+  { id:'t60',     icon:'⏱', name:'るいけい 1時間',  cond:()=>timeData&&timeData.total>=3600 },
+  { id:'t300',    icon:'🕰️', name:'るいけい 5時間',  cond:()=>timeData&&timeData.total>=18000 },
 ];
 
 function badgeId(b){ return b.grade ? b.id+':'+STORAGE_KEY : b.id; }
