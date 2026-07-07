@@ -158,3 +158,120 @@ canvas.writing-canvas{width:100%;height:120px;background:rgba(255,255,255,0.03);
 
 @media(max-width:520px){.cat-grid{grid-template-columns:1fr 1fr}.kanji-grid{grid-template-columns:repeat(auto-fill,minmax(50px,1fr))}.modal-kanji{font-size:60px}}
 @media(max-width:360px){.cat-grid{grid-template-columns:1fr}}
+
+/* サウンドON/OFF（ヘッダー） */
+.sound-controls{display:flex;gap:8px;margin-left:auto;margin-right:14px}
+.sound-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--card);font-size:17px;cursor:pointer;transition:all 0.2s;line-height:1}
+.sound-btn:hover{border-color:var(--accent)}
+.sound-btn.off{opacity:0.45}
+
+/* まちがえた問題だけやりなおすボタン */
+.res-btn.wrong-retry{background:linear-gradient(135deg,var(--accent3),#c44560);color:white;border-color:transparent}
+
+/* おいわいの紙吹雪 */
+.confetti{position:fixed;top:-32px;z-index:300;pointer-events:none;animation:confetti-fall 2.8s linear forwards}
+@keyframes confetti-fall{to{transform:translateY(110vh) rotate(560deg);opacity:0.5}}
+
+/* きょうのもくひょう＋れんぞく日数パネル */
+.daily-panel{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:18px;box-shadow:var(--shadow)}
+.dp-streak{display:flex;align-items:baseline;gap:4px;white-space:nowrap}
+.dp-fire{font-size:22px}
+.dp-streak b{font-size:24px;color:var(--gold);font-weight:900}
+.dp-unit{font-size:11px;color:var(--text2);font-weight:600}
+.dp-goal{flex:1;min-width:0}
+.dp-label{font-size:12px;color:var(--text2);font-weight:600;margin-bottom:6px}
+.dp-label b{color:var(--text3)}
+.dp-bar-wrap{height:10px;background:var(--bg3);border-radius:5px;overflow:hidden}
+.dp-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:5px;transition:width 0.4s}
+.dp-bar.done{background:linear-gradient(90deg,var(--gold),var(--green))}
+
+/* カテゴリ星評価 */
+.cat-header{position:relative}
+.cat-stars{margin-left:auto;font-size:13px;letter-spacing:1px;white-space:nowrap}
+.cat-stars i{font-style:normal;opacity:0.3}
+.res-stars{font-size:30px;letter-spacing:4px;margin:6px 0 2px}
+.res-stars i{font-style:normal;opacity:0.3}
+.res-stars-hint{display:block;font-size:12px;color:var(--text2);letter-spacing:0;margin-top:4px;font-weight:600}
+
+/* にがてとっくんカード */
+.weak-card{border-color:rgba(232,93,117,0.45);background:linear-gradient(135deg,rgba(232,93,117,0.10),var(--card))}
+.weak-card:hover{border-color:var(--accent3)}
+.weak-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.weak-chips span{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 4px;background:rgba(232,93,117,0.14);border:1px solid rgba(232,93,117,0.35);border-radius:8px;font-size:16px;font-weight:700;color:var(--text3)}
+
+/* 漢字マスター段階 */
+.kanji-chip{position:relative}
+.kanji-chip.master{border-color:var(--gold);background:linear-gradient(135deg,rgba(240,192,64,0.14),var(--card))}
+.kanji-chip.master .kanji-char{color:var(--gold)}
+.chip-star{position:absolute;top:2px;right:4px;font-size:10px}
+.modal-mastery{font-size:12px;font-weight:700;color:var(--gold);margin:6px 0 2px}
+
+/* バッジ */
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 18px}
+.badge-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);font-size:11px;font-weight:700;color:var(--text2);opacity:0.38}
+.badge-chip.on{opacity:1;border-color:var(--gold);color:var(--text3);background:linear-gradient(135deg,rgba(240,192,64,0.12),var(--card))}
+.badge-chip .b-icon{font-size:14px}
+
+/* べんきょうのきろく（直近7日ミニグラフ） */
+.time-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin:-6px 0 18px;box-shadow:var(--shadow)}
+.tp-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;font-size:12px;font-weight:700;color:var(--text3);margin-bottom:10px}
+.tp-sums{font-size:11px;color:var(--text2);font-weight:600}
+.tp-sums b{color:var(--accent)}
+.tp-chart{display:flex;gap:6px;height:78px}
+.tp-col{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0}
+.tp-val{font-size:9px;color:var(--text2);font-weight:700;height:13px;white-space:nowrap}
+.tp-bar-area{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.tp-bar{width:60%;max-width:26px;background:rgba(79,158,255,0.45);border-radius:4px 4px 0 0;transition:height 0.4s}
+.tp-bar.empty{background:var(--bg3)}
+.tp-col.today .tp-bar{background:linear-gradient(180deg,var(--accent),var(--green))}
+.tp-dow{font-size:10px;color:var(--text2);font-weight:700;margin-top:4px}
+.tp-col.today .tp-dow{color:var(--accent)}
+
+/* きょうの10もん スタートボタン */
+.daily-panel{flex-wrap:wrap}
+.dp-ten{display:flex;flex-direction:column;align-items:center;gap:1px;padding:10px 16px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 4px 14px rgba(79,158,255,0.35);transition:transform 0.15s,opacity 0.2s;white-space:nowrap}
+.dp-ten span{font-size:10px;font-weight:700;opacity:0.9}
+.dp-ten:hover{transform:translateY(-2px)}
+.dp-ten:active{transform:scale(0.96)}
+
+/* レベル＆しょうごう */
+.dp-level{display:flex;align-items:center;gap:10px;min-width:150px}
+.dp-lv{display:flex;align-items:center;justify-content:center;min-width:52px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:white;font-size:14px;font-weight:900;padding:0 8px}
+.dp-level-info{display:flex;flex-direction:column;gap:4px;min-width:0}
+.dp-title{font-size:11px;font-weight:800;color:var(--text3);white-space:nowrap}
+.dp-xp-wrap{width:96px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.dp-xp{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:width 0.4s}
+
+/* がくねんマスターへの道 */
+.head-stars{float:right;font-size:12px;font-weight:700;color:var(--gold)}
+
+/* クイックもんだい */
+.quick-entry{border-color:rgba(240,192,64,0.45);background:linear-gradient(135deg,rgba(240,192,64,0.10),var(--card))}
+.quick-entry:hover{border-color:var(--gold)}
+.quick-bonus-tag{color:var(--gold);font-weight:700}
+.quick-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);max-width:640px;margin:0 auto}
+.quick-q{font-size:20px;font-weight:700;color:var(--text3);line-height:1.9;margin-bottom:18px;text-align:center}
+.qq-focus{color:var(--accent);font-size:1.5em;font-family:'Noto Serif JP',serif}
+.qq-blank{display:inline-block;min-width:1.4em;text-align:center;color:var(--gold);border-bottom:3px solid var(--gold);font-weight:900}
+.qq-sub{font-size:13px;color:var(--text2)}
+.quick-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.quick-choice{padding:16px 10px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-family:inherit;font-size:20px;font-weight:700;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.quick-choice:hover:not(:disabled){border-color:var(--accent);transform:translateY(-2px)}
+.quick-choice:disabled{cursor:default;opacity:0.75}
+.quick-choice.correct{background:rgba(62,207,142,0.18);border-color:var(--green);color:var(--green);opacity:1;animation:qc-pop 0.3s}
+.quick-choice.wrong{background:rgba(232,93,117,0.15);border-color:var(--accent3);color:var(--accent3);opacity:1}
+@keyframes qc-pop{50%{transform:scale(1.06)}}
+.quick-explain{margin-top:14px;font-size:14px;font-weight:600;color:var(--text2);text-align:center;min-height:22px;opacity:0;transition:opacity 0.25s;line-height:1.8}
+.quick-explain.show{opacity:1}
+.qe-ok{color:var(--green)}
+.qe-ng{color:var(--accent3)}
+.quick-reward{margin-top:18px;padding:14px 18px;background:rgba(240,192,64,0.10);border:1px solid rgba(240,192,64,0.35);border-radius:12px;font-size:14px;font-weight:700;color:var(--text3);display:inline-block}
+.quick-reward b{color:var(--gold)}
+.quick-next{margin-top:8px;font-size:12px;color:var(--text2);font-weight:600}
+
+/* この字をれんしゅうボタン（モーダル） */
+.modal-practice{display:block;width:100%;padding:12px;margin-bottom:8px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;transition:opacity 0.2s}
+.modal-practice:hover{opacity:0.85}
+
+/* つぎのしょうごう予告 */
+.dp-next{font-size:9px;color:var(--text2);font-weight:700;white-space:nowrap}

@@ -12,6 +12,9 @@ const Quiz = {
   // まちがえた問題の復習キュー（35%の確率で優先再出題、最大10件）
   reviewQueue: [],
 
+  // このプレイでまちがえた漢字（リザルト表示用。Game.startでリセット）
+  sessionWrong: [],
+
   // 全学年の漢字 → エントリ の逆引き（図鑑用）
   kanjiMap: {},
 
@@ -34,6 +37,27 @@ const Quiz = {
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
+  },
+
+  // 出題する字を選ぶ。まちがえたことがある字（正解数<出題数）を35%の確率で優先（見えない弱点補強）
+  pickTarget(pool) {
+    if (Math.random() < 0.35) {
+      const z = SaveMgr.data.zukan;
+      const weak = pool.filter(o => { const r = z[o.k]; return r && r.c < r.s; });
+      if (weak.length) return this.rand(weak);
+    }
+    return this.rand(pool);
+  },
+
+  // 誤答を3つ選ぶ。正解や他の誤答とテキストが重複するものは除外（見た目が同じ選択肢を出さない）
+  pickWrongs(pool, toText, correctText, n = 3) {
+    const out = [];
+    for (const o of this.shuffle(pool)) {
+      const v = toText(o);
+      if (v !== correctText && !out.includes(v)) out.push(v);
+      if (out.length === n) return out;
+    }
+    return null;
   },
 
   // 設定から出題学年のプールを決める
@@ -75,8 +99,12 @@ const Quiz = {
       const q = this.build(type, grade);
       if (q) return q;
     }
-    // 保険：必ず作れる読み問題
-    return this.build("yomi", this.rand(this.gradePool(gradeSetting)));
+    // 保険：読み問題ならほぼ確実に作れる。万一 null なら全学年から探す
+    for (const g of this.shuffle(this.gradePool(gradeSetting).concat(Object.keys(QDATA)))) {
+      const q = this.build("yomi", g);
+      if (q) return q;
+    }
+    return null;
   },
 
   build(type, grade) {
@@ -85,32 +113,33 @@ const Quiz = {
 
     switch (type) {
       case "yomi": {
-        const e = this.rand(K);
-        const wrongs = this.shuffle(K.filter(o => o.k !== e.k && o.y[0] !== e.y[0])).slice(0, 3).map(o => o.y[0]);
-        if (wrongs.length < 3) return null;
+        const e = this.pickTarget(K);
+        // 出題漢字の「別の正しい読み」を誤答に出さない（!e.y.includes）
+        const pool = K.filter(o => o.k !== e.k && !e.y.includes(o.y[0]));
+        const wrongs = this.pickWrongs(pool, o => o.y[0], e.y[0]);
         return this.pack("よみかた", `「<span class="focus">${e.k}</span>」の よみかたは？`,
           e.y[0], wrongs, `「${e.k}」は「${e.y.join("・")}」と よむよ`, [e.k]);
       }
 
       case "kanji": {
-        const e = this.rand(K);
+        const e = this.pickTarget(K);
         // 同じ読みを持つ漢字は誤答にしない
-        const wrongs = this.shuffle(K.filter(o => o.k !== e.k && !o.y.includes(e.y[0]))).slice(0, 3).map(o => o.k);
-        if (wrongs.length < 3) return null;
+        const pool = K.filter(o => o.k !== e.k && !o.y.includes(e.y[0]));
+        const wrongs = this.pickWrongs(pool, o => o.k, e.k);
         return this.pack("かんじ", `「<span class="focus">${e.y[0]}</span>」と よむ かんじは？`,
           e.k, wrongs, `「${e.y[0]}」は「${e.k}」（${e.m}）`, [e.k]);
       }
 
       case "imi": {
-        const e = this.rand(K);
+        const e = this.pickTarget(K);
+        // 意味が同じ字は「実質正解が2つ」になるため誤答にしない（o.m !== e.m）
+        const pool = K.filter(o => o.k !== e.k && o.m !== e.m);
         if (Math.random() < 0.5) {
-          const wrongs = this.shuffle(K.filter(o => o.k !== e.k)).slice(0, 3).map(o => o.k);
-          if (wrongs.length < 3) return null;
+          const wrongs = this.pickWrongs(pool, o => o.k, e.k);
           return this.pack("いみ", `「${e.m}」<br>この いみの かんじは？`,
             e.k, wrongs, `せいかいは「${e.k}」（${e.y[0]}）`, [e.k]);
         } else {
-          const wrongs = this.shuffle(K.filter(o => o.k !== e.k)).slice(0, 3).map(o => o.m);
-          if (wrongs.length < 3) return null;
+          const wrongs = this.pickWrongs(pool, o => o.m, e.m);
           return this.pack("いみ", `「<span class="focus">${e.k}</span>」の いみは？`,
             e.m, wrongs, `「${e.k}」（${e.y[0]}）は「${e.m}」`, [e.k]);
         }
@@ -118,7 +147,7 @@ const Quiz = {
 
       case "bushu": {
         const withBushu = K.filter(o => o.b);
-        const target = this.rand(withBushu);
+        const target = withBushu.length ? this.pickTarget(withBushu) : null;
         if (!target) return null;
         const same = withBushu.filter(o => o.b === target.b && o.k !== target.k);
         const diff = withBushu.filter(o => o.b !== target.b);
@@ -170,7 +199,7 @@ const Quiz = {
 
       case "strokeCount": {
         const withS = K.filter(o => o.s);
-        const e = this.rand(withS);
+        const e = withS.length ? this.pickTarget(withS) : null;
         if (!e) return null;
         const offsets = this.shuffle([-2, -1, 1, 2, 3]).slice(0, 3);
         const wrongs = offsets.map(o => Math.max(1, e.s + o) + "かく");
@@ -190,7 +219,10 @@ const Quiz = {
 
   // 問題オブジェクトに詰める（選択肢をシャッフル）
   pack(typeLabel, text, correct, wrongs, explain, zukanChars) {
+    if (!wrongs || wrongs.length < 3) return null;
     const choices = this.shuffle([correct, ...wrongs.slice(0, 3)]);
+    // 同一テキストの選択肢があると correctIdx の判定が狂うため、この問題は捨てて作り直す
+    if (new Set(choices).size < choices.length) return null;
     return {
       typeLabel, text, choices,
       correctIdx: choices.indexOf(correct),
@@ -267,6 +299,8 @@ const Quiz = {
         explainEl.innerHTML = `<span class="ng">${chosenIdx < 0 ? "じかんぎれ…" : "ざんねん…"}</span> ${q.explain}`;
         // まちがえた問題は あとで もう一度出す
         if (this.reviewQueue.length < 10) this.reviewQueue.push(q);
+        // リザルトの「きょう まちがえた かんじ」用に記録
+        for (const c of q.zukan) if (!this.sessionWrong.includes(c)) this.sessionWrong.push(c);
       }
 
       // 図鑑に記録

@@ -248,7 +248,9 @@ function loadLearnedCount(key) {
 }
 
 function applyProgress(id, learned, total) {
-  const pct = total > 0 ? Math.min(100, Math.round((learned / total) * 100)) : 0;
+  // 復習問題（前の学年の漢字）ぶんで字数を超えないように上限を掛ける
+  learned = Math.min(learned, total);
+  const pct = total > 0 ? Math.round((learned / total) * 100) : 0;
   document.getElementById('fill' + id).style.width = pct + '%';
   document.getElementById('label' + id).textContent = learned + ' / ' + total;
 }

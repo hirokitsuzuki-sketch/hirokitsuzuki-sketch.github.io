@@ -721,3 +721,23 @@ button:disabled { opacity: 0.45; cursor: default; }
   .tower-btn { width: 48px; padding: 3px 2px; }
   .tower-btn .t-name { display: none; }
 }
+
+/* れんぞくプレイ日数 */
+.streak-chip{font-size:0.7rem;font-weight:800;color:var(--gold);background:rgba(240,192,64,0.12);border:1px solid rgba(240,192,64,0.35);border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:middle}
+
+/* リザルト：きょうまちがえた かんじ */
+.result-wrong-title{font-size:0.72rem;font-weight:800;color:var(--text2);margin-top:4px}
+.result-wrong-list{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:420px}
+.rw-chip{display:inline-flex;flex-direction:column;align-items:center;min-width:44px;padding:5px 7px;background:rgba(255,93,108,0.10);border:1px solid rgba(255,93,108,0.35);border-radius:9px}
+.rw-chip b{font-size:1.15rem;color:var(--text)}
+.rw-chip i{font-style:normal;font-size:0.58rem;color:var(--text2);font-weight:700;margin-top:1px;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 図鑑：にがてマーク */
+.zukan-cell.weak{border-color:rgba(255,93,108,0.65);box-shadow:inset 0 0 0 1px rgba(255,93,108,0.3)}
+
+/* ステージ星の合計（スターコレクター実績への進捗） */
+.stage-star-total{float:right;font-size:0.72rem;font-weight:800;color:var(--gold)}
+
+/* 図鑑：にがてだけフィルター */
+.zukan-weak-toggle{margin-left:8px;padding:3px 10px;border-radius:999px;border:1px solid rgba(255,93,108,0.45);background:transparent;color:var(--red);font-family:inherit;font-size:0.68rem;font-weight:800;cursor:pointer;vertical-align:middle}
+.zukan-weak-toggle.active{background:rgba(255,93,108,0.18)}

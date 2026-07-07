@@ -31,7 +31,7 @@ const Screens = {
         <div class="player-bar">
           <div class="player-level-badge"><span class="lv">Lv</span><span class="num">${d.level}</span></div>
           <div class="info">
-            <div class="name">ぼうえいたいちょう</div>
+            <div class="name">ぼうえいたいちょう${(d.playStreak && d.playStreak.days >= 1) ? ` <span class="streak-chip">🔥${d.playStreak.days}日れんぞく</span>` : ""}</div>
             <div class="xp-bar"><div class="xp-fill" style="width:${Math.min(100, d.xp / need * 100)}%"></div></div>
             <div class="xp-label">XP ${d.xp} / ${need}</div>
           </div>
@@ -56,7 +56,7 @@ const Screens = {
           `).join("")}
         </div>
 
-        <div class="section-h">🗺️ ステージをえらぼう</div>
+        <div class="section-h">🗺️ ステージをえらぼう <span class="stage-star-total">⭐ ${d.stats.stars} / ${STAGES.length * 3}${d.stats.stars >= STAGES.length * 3 ? " コンプリート！" : ""}</span></div>
         <div class="stage-list">
           ${STAGES.map(st => {
             const rec = d.stages[st.id];
@@ -170,6 +170,12 @@ const Screens = {
         </div>
         ${r.win && r.stars < 3 ? `<div style="font-size:0.75rem;font-weight:700;color:var(--text2)">HPを へらさず クリアすると ⭐3つ！</div>` : ""}
         ${r.newAch.length ? `<div class="result-new">🏆 あたらしい実績 ${r.newAch.length}こ かいじょ！</div>` : ""}
+        ${r.wrongKanji && r.wrongKanji.length ? `
+          <div class="result-wrong-title">📖 きょう まちがえた かんじ — あとで れんしゅうしよう</div>
+          <div class="result-wrong-list">
+            ${r.wrongKanji.slice(0, 12).map(w => `<span class="rw-chip"><b>${w.k}</b><i>${w.y}</i></span>`).join("")}
+            ${r.wrongKanji.length > 12 ? '<span class="rw-chip"><b>…</b></span>' : ""}
+          </div>` : ""}
         <div class="modal-close-row" style="flex-wrap:wrap;gap:8px">
           <button class="modal-btn" id="res-home">🏠 ホーム</button>
           <button class="modal-btn ${showNext ? "" : "primary"}" id="res-retry">🔄 もういちど</button>
@@ -190,14 +196,22 @@ const Screens = {
      かんじ図鑑
      ========================================= */
 
-  showZukan(tab = "2") {
+  showZukan(tab, weakOnly = false) {
+    // 初期タブは「もんだいの がくねん」設定に合わせる（ミックスは2年生）
+    if (!tab) {
+      const g = SaveMgr.data.settings.grade;
+      tab = QDATA[g] ? g : "2";
+    }
     const layer = document.getElementById("modal-layer");
     layer.classList.remove("hidden");
 
     const entries = QDATA[tab].kanji;
     const z = SaveMgr.data.zukan;
+    const isWeak = e => { const r = z[e.k]; return r && r.c < r.s && r.c < 3; };
     const learned = entries.filter(e => z[e.k] && z[e.k].c >= 3).length;
     const seen = entries.filter(e => z[e.k] && z[e.k].s > 0).length;
+    const weakN = entries.filter(isWeak).length;
+    const shown = weakOnly ? entries.filter(isWeak) : entries;
 
     layer.innerHTML = `
       <div class="modal-box">
@@ -205,16 +219,20 @@ const Screens = {
         <div class="zukan-tabs">
           ${["1", "2", "3", "4", "5", "6"].map(g => `<button class="zukan-tab ${g === tab ? "active" : ""}" data-tab="${g}">${g}年生</button>`).join("")}
         </div>
-        <div class="zukan-stat">であった ${seen} / マスター（3回せいかい） <span style="color:var(--gold)">${learned}</span> / ぜんぶ ${entries.length}</div>
+        <div class="zukan-stat">であった ${seen} / マスター（3回せいかい） <span style="color:var(--gold)">${learned}</span>${weakN ? ` / にがて <span style="color:var(--red)">${weakN}</span>` : ""} / ぜんぶ ${entries.length}
+          ${weakN ? `<button class="zukan-weak-toggle ${weakOnly ? "active" : ""}" id="zukan-weak-btn">🩹 にがてだけ</button>` : ""}
+        </div>
         <div class="zukan-detail" id="zukan-detail">
           <div class="zm" style="padding-top:24px">かんじを タップすると くわしく みられるよ</div>
         </div>
         <div class="zukan-grid">
-          ${entries.map((e, i) => {
+          ${shown.map((e, i) => {
             const rec = z[e.k];
-            const cls = rec && rec.c >= 3 ? "master" : rec && rec.s > 0 ? "seen" : "unseen";
+            const weak = isWeak(e);
+            const cls = rec && rec.c >= 3 ? "master" : rec && rec.s > 0 ? (weak ? "seen weak" : "seen") : "unseen";
             return `<button class="zukan-cell ${cls}" data-i="${i}">${e.k}</button>`;
           }).join("")}
+          ${shown.length === 0 ? '<div class="zm" style="grid-column:1/-1;padding:14px 0">にがてな かんじは ないよ！すごい！</div>' : ""}
         </div>
         <div class="modal-close-row">
           <button class="modal-btn" id="zukan-close">とじる</button>
@@ -223,17 +241,19 @@ const Screens = {
     `;
 
     layer.querySelectorAll(".zukan-tab").forEach(btn => {
-      btn.addEventListener("click", () => this.showZukan(btn.dataset.tab));
+      btn.addEventListener("click", () => this.showZukan(btn.dataset.tab, weakOnly));
     });
+    const weakBtn = document.getElementById("zukan-weak-btn");
+    if (weakBtn) weakBtn.addEventListener("click", () => this.showZukan(tab, !weakOnly));
     layer.querySelectorAll(".zukan-cell").forEach(btn => {
       btn.addEventListener("click", () => {
-        const e = entries[parseInt(btn.dataset.i, 10)];
+        const e = shown[parseInt(btn.dataset.i, 10)];
         const rec = z[e.k];
         document.getElementById("zukan-detail").innerHTML = `
           <div class="zk">${e.k}</div>
           <div class="zy">よみ：${e.y.join("・")}</div>
           <div class="zm">${e.m}${e.b ? `　／　ぶしゅ：${e.b}` : ""}${e.s ? `　／　${e.s}かく` : ""}</div>
-          <div class="zc">${rec ? `せいかい ${rec.c}かい ／ 出題 ${rec.s}かい ${rec.c >= 3 ? "⭐マスター！" : ""}` : "まだ もんだいに でていないよ"}</div>
+          <div class="zc">${rec ? `せいかい ${rec.c}かい ／ まちがい ${rec.s - rec.c}かい ${rec.c >= 3 ? "⭐マスター！" : (rec.c < rec.s ? "🩹にがて…れんしゅうしよう" : "")}` : "まだ もんだいに でていないよ"}</div>
         `;
       });
     });

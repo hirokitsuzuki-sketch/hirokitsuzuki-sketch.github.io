@@ -69,6 +69,8 @@ const Game = {
     this.selectedTowerType = null;
     this.selectedTower = null;
     this.session = { kills: 0, correct: 0, wrong: 0, maxCombo: 0, coinsEarned: 0, towersBuilt: 0 };
+    Quiz.sessionWrong = [];
+    SaveMgr.touchStreak();
     FX.reset();
 
     // 経路をピクセルに変換
@@ -80,6 +82,7 @@ const Game = {
     this.buildMapCache();
     this.buildPalette();
     this.hideTowerPopup();
+    if (this._hud) this._hud.v = {}; // パレット再生成後に全HUD項目を確実に書き直す
 
     document.getElementById("btn-speed").textContent = "▶ x1";
     BGM.play("battle");
@@ -256,7 +259,8 @@ const Game = {
 
     const hasBoss = wave.some(g => ENEMIES[g.t].boss);
     this.showWaveBanner(hasBoss ? "👹 ボスウェーブ！" : `ウェーブ ${this.waveIdx + 1}`, hasBoss);
-    if (hasBoss) { SFX.bossRoar(); FX.shake(10); BGM.play("boss"); }
+    // 咆哮とシェイクはボス出現時（spawnEnemy）に任せ、ここでは曲だけ切り替える（演出の二重発火防止）
+    if (hasBoss) BGM.play("boss");
   },
 
   spawnEnemy(typeId) {
@@ -288,7 +292,7 @@ const Game = {
     if (this.waveState !== "ready") return;
     const bonus = Math.floor(this.waveCountdown) * 5;
     if (bonus > 0) {
-      this.coins += bonus;
+      this.gainCoins(bonus, null);
       FX.text(GRID.w / 2, GRID.h / 2, `はやおしボーナス +${bonus}🪙`, "#ffd54d", 20);
     }
     this.waveCountdown = 0;
@@ -734,6 +738,10 @@ const Game = {
       maxCombo: s.maxCombo, coinsEarned: s.coinsEarned,
       lifeLeft: this.life, baseHp: this.stage.baseHp,
       newAch,
+      // きょう まちがえた かんじ（読みつき）
+      wrongKanji: Quiz.sessionWrong.map(k => ({
+        k, y: Quiz.kanjiMap[k] ? Quiz.kanjiMap[k].entry.y.join("・") : "",
+      })),
     });
   },
 
@@ -746,31 +754,42 @@ const Game = {
      HUD
      ========================================= */
 
+  // 毎フレーム呼ばれるため、要素をキャッシュし「値が変わったときだけ」DOMに書く
+  // （毎フレームのDOM書き換えはスタイル再計算を誘発し、スマホの負荷・発熱の原因になる）
+  _hud: null,
   updateHUD() {
-    document.querySelector("#hud-life span").textContent = this.life;
-    document.querySelector("#hud-coin span").textContent = this.coins;
-    document.querySelector("#hud-wave span").textContent = `${Math.max(1, this.waveIdx + 1)}/${this.stage.waves.length}`;
-
-    const comboEl = document.getElementById("hud-combo");
-    comboEl.querySelector(".combo-num").textContent = this.combo;
-    comboEl.classList.toggle("hot", this.combo >= 3);
-
-    // スキルゲージ
-    const pct = (this.skillGauge / SKILL_GAUGE.max) * 100;
-    document.getElementById("skill-gauge-fill").style.width = pct + "%";
-    const minCost = Math.min(...Object.values(SKILLS).map(s => s.cost));
-    document.getElementById("btn-skill").disabled = this.skillGauge < minCost;
-
-    // つぎのウェーブボタン
-    const waveBtn = document.getElementById("btn-next-wave");
-    if (this.waveState === "ready" && this.running) {
-      waveBtn.classList.remove("hidden");
-      waveBtn.textContent = `⚔️ つぎのウェーブ（${Math.ceil(this.waveCountdown)}）`;
-    } else {
-      waveBtn.classList.add("hidden");
+    if (!this._hud) {
+      this._hud = {
+        life: document.querySelector("#hud-life span"),
+        coin: document.querySelector("#hud-coin span"),
+        wave: document.querySelector("#hud-wave span"),
+        combo: document.getElementById("hud-combo"),
+        comboNum: document.querySelector("#hud-combo .combo-num"),
+        gauge: document.getElementById("skill-gauge-fill"),
+        skillBtn: document.getElementById("btn-skill"),
+        waveBtn: document.getElementById("btn-next-wave"),
+        minSkillCost: Math.min(...Object.values(SKILLS).map(s => s.cost)),
+        v: {},
+      };
     }
+    const H = this._hud, v = H.v;
+    const w = (key, val, apply) => { if (v[key] !== val) { v[key] = val; apply(val); } };
 
-    this.refreshPalette();
+    w("life", this.life, (x) => H.life.textContent = x);
+    w("coins", this.coins, (x) => { H.coin.textContent = x; this.refreshPalette(); });
+    w("wave", `${Math.max(1, this.waveIdx + 1)}/${this.stage.waves.length}`, (x) => H.wave.textContent = x);
+    w("combo", this.combo, (x) => {
+      H.comboNum.textContent = x;
+      H.combo.classList.toggle("hot", x >= 3);
+    });
+    w("gauge", Math.round((this.skillGauge / SKILL_GAUGE.max) * 500), (x) => H.gauge.style.width = (x / 5) + "%");
+    w("skillOff", this.skillGauge < H.minSkillCost, (x) => H.skillBtn.disabled = x);
+    const waveText = (this.waveState === "ready" && this.running)
+      ? `⚔️ つぎのウェーブ（${Math.ceil(this.waveCountdown)}）` : null;
+    w("waveBtn", waveText, (x) => {
+      if (x === null) { H.waveBtn.classList.add("hidden"); }
+      else { H.waveBtn.classList.remove("hidden"); H.waveBtn.textContent = x; }
+    });
   },
 
   /* =========================================
