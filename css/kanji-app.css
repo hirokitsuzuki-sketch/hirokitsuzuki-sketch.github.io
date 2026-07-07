@@ -233,3 +233,11 @@ canvas.writing-canvas{width:100%;height:120px;background:rgba(255,255,255,0.03);
 .dp-ten span{font-size:10px;font-weight:700;opacity:0.9}
 .dp-ten:hover{transform:translateY(-2px)}
 .dp-ten:active{transform:scale(0.96)}
+
+/* レベル＆しょうごう */
+.dp-level{display:flex;align-items:center;gap:10px;min-width:150px}
+.dp-lv{display:flex;align-items:center;justify-content:center;min-width:52px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:white;font-size:14px;font-weight:900;padding:0 8px}
+.dp-level-info{display:flex;flex-direction:column;gap:4px;min-width:0}
+.dp-title{font-size:11px;font-weight:800;color:var(--text3);white-space:nowrap}
+.dp-xp-wrap{width:96px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.dp-xp{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:width 0.4s}

@@ -7,7 +7,7 @@ let state = {
 let answeredCount = 0, correctCount = 0, streak = 0, lastPct = -1;
 
 window.addEventListener('DOMContentLoaded', () => {
-  loadState(); loadDaily(); loadBadges(); loadTimeData();
+  loadState(); loadDaily(); loadBadges(); loadTimeData(); loadXp();
   renderDailyPanel(); renderBadgeRow(); renderTimePanel();
   renderCatGrid(); renderKanjiGrid(); updateGlobalProgress();
   setupTimeTracking();
@@ -146,9 +146,47 @@ function bumpDaily(correct) {
   renderTimePanel();
   if (!daily.goalDone && daily.solved >= DAILY_GOAL) {
     daily.goalDone = true;
+    addXp(10); // もくひょう達成ボーナス
     setTimeout(() => { showToast('🎯 きょうの もくひょう たっせい！'); sfx('fanfare'); dropConfetti(24); }, 700);
   }
   saveDaily();
+  renderDailyPanel();
+}
+
+/* =========================================================
+   レベル＆しょうごう（全学年共通のXP。正解で獲得、復習は割増）
+   ========================================================= */
+const XP_KEY = 'kanji_xp_v1';
+let xpData = { xp: 0 };
+
+const TITLES = [
+  [1,'かんじ みならい'],[3,'かんじ れんしゅうせい'],[5,'かんじ ファイター'],
+  [8,'かんじ ハンター'],[12,'かんじ ナイト'],[16,'かんじ マスター'],
+  [20,'グランドマスター'],[25,'かんじ はかせ'],[30,'かんじ レジェンド'],
+];
+
+function loadXp(){ try{ const p=JSON.parse(localStorage.getItem(XP_KEY)); if(p&&typeof p.xp==='number') xpData=p; }catch(e){} }
+function saveXp(){ try{ localStorage.setItem(XP_KEY,JSON.stringify(xpData)); }catch(e){} }
+
+function xpNeed(lv){ return 20+(lv-1)*12; }  // レベルごとの必要XP（ゆるやかに増加）
+function xpLevel(){
+  let lv=1, rest=xpData.xp;
+  while(rest>=xpNeed(lv)){ rest-=xpNeed(lv); lv++; }
+  return { lv, rest, need: xpNeed(lv) };
+}
+function titleFor(lv){ let t=TITLES[0][1]; for(const [l,n] of TITLES) if(lv>=l) t=n; return t; }
+
+function addXp(n){
+  const before=xpLevel().lv;
+  xpData.xp+=n;
+  saveXp();
+  const after=xpLevel().lv;
+  if(after>before){
+    sfx('fanfare'); dropConfetti(18);
+    showToast(`🎉 レベルアップ！ Lv.${after} になった！`);
+    const newTitle=titleFor(after);
+    if(newTitle!==titleFor(before)) setTimeout(()=>showToast(`✨ しょうごうが「${newTitle}」に しんか！`),1700);
+  }
   renderDailyPanel();
 }
 
@@ -223,7 +261,15 @@ function renderDailyPanel() {
     home.insertBefore(el, anchor);
   }
   const n = Math.min(DAILY_GOAL, daily.solved);
+  const L = xpLevel();
   el.innerHTML = `
+    <div class="dp-level" title="せいかいで XPがたまるよ！">
+      <span class="dp-lv">Lv.${L.lv}</span>
+      <div class="dp-level-info">
+        <span class="dp-title">${titleFor(L.lv)}</span>
+        <div class="dp-xp-wrap"><div class="dp-xp" style="width:${L.rest / L.need * 100}%"></div></div>
+      </div>
+    </div>
     <div class="dp-streak"><span class="dp-fire">🔥</span><b>${daily.streak || 0}</b><span class="dp-unit">日れんぞく</span></div>
     <div class="dp-goal">
       <div class="dp-label">🎯 きょうのもくひょう <b>${daily.goalDone ? 'たっせい！✔' : n + ' / ' + DAILY_GOAL + '問'}</b></div>
@@ -546,6 +592,7 @@ function markAnswer(i,correct){
       if(state.weak[kanji]<=0){ delete state.weak[kanji]; showToast(`🎓「${kanji}」を にがてから そつぎょう！`); }
     }
     sfx('correct', streak);
+    addXp(state.currentQuestions[i].review?3:2); // 復習の正解は割増XP
     if(streak===3||streak===5||streak===10||streak===15) showToast(`🔥 ${streak}れんぞく せいかい！すごい！`);
   } else {
     streak=0;
@@ -575,6 +622,7 @@ function markAnswer(i,correct){
 function showResults(correct,total){
   const pct=Math.round(correct/total*100);
   lastPct=pct;
+  addXp(5+(pct===100?10:0)); // 完走ボーナス＋パーフェクトボーナス
   checkBadges();
   document.getElementById('resScore').textContent=pct+'%';
   document.getElementById('resLabel').textContent=`${correct} / ${total} 問正解`;
