@@ -7,7 +7,7 @@ let state = {
 let answeredCount = 0, correctCount = 0, streak = 0, lastPct = -1;
 
 window.addEventListener('DOMContentLoaded', () => {
-  loadState(); loadDaily(); loadBadges(); loadTimeData(); loadXp();
+  loadState(); loadDaily(); loadBadges(); loadTimeData(); loadXp(); loadQuick();
   renderDailyPanel(); renderBadgeRow(); renderTimePanel();
   renderCatGrid(); renderKanjiGrid(); updateGlobalProgress();
   setupTimeTracking();
@@ -121,6 +121,7 @@ function loadDaily() {
   const today = dayKey(new Date());
   if (daily.date !== today) {
     daily.date = today; daily.solved = 0; daily.correct = 0; daily.goalDone = false;
+    daily.quick = 0; // クイックもんだいの日次ボーナスもリセット
   }
 }
 
@@ -209,6 +210,8 @@ const BADGES = [
   { id:'t300',    icon:'🕰️', name:'るいけい 5時間',  cond:()=>timeData&&timeData.total>=18000 },
   { id:'s3all',   icon:'🌟', name:'ぜんカテゴリ ⭐3', grade:true, big:true,
     cond:()=>CATEGORIES.every(c=>(state.catStars[c.id]||0)>=3) },
+  { id:'q10',     icon:'⚡', name:'クイック 10回',   cond:()=>quickData.total>=10 },
+  { id:'q50',     icon:'🌩️', name:'クイック 50回',   cond:()=>quickData.total>=50 },
 ];
 
 function badgeId(b){ return b.grade ? b.id+':'+STORAGE_KEY : b.id; }
@@ -366,7 +369,19 @@ function renderCatGrid() {
     const maxStars=CATEGORIES.length*3;
     headEl.innerHTML=`カテゴリを選ぼう <span class="head-stars">🌟 がくねんマスターへの道 ⭐ ${totalStars} / ${maxStars}</span>`;
   }
-  document.getElementById('catGrid').innerHTML = weakCard + CATEGORIES.map(cat => {
+  // クイックもんだいカード（くり返しボーナスの予告つき）
+  const plays=daily?(daily.quick||0):0;
+  const quickCard=`
+    <div class="cat-card quick-entry" onclick="startQuickQuiz()">
+      <div class="cat-header"><span class="cat-emoji">⚡</span>
+        <div><div class="cat-name">クイックもんだい</div><div class="cat-count">4たくで ${QUICK_N}問 ・ タップでこたえる</div></div>
+      </div>
+      <div class="cat-score">
+        <span>きょう ${plays}回クリア</span>
+        <span class="quick-bonus-tag">つぎのクリアで +${quickBonus(plays+1)}XP</span>
+      </div>
+    </div>`;
+  document.getElementById('catGrid').innerHTML = weakCard + quickCard + CATEGORIES.map(cat => {
     const sc=state.scores[cat.id]||{correct:0,total:0};
     const total=ALL_QUESTIONS.filter(q=>q.cat===cat.id).length;
     // 進捗バーは「正解したことのある漢字の数」基準（再挑戦しても下がらない）
@@ -457,6 +472,199 @@ function startDailyTen() {
   if(chosen.length<10)
     for(const q of shuffleArr(ALL_QUESTIONS)) push(q,true);
   beginQuizCustom('▶️ きょうの10もん','にがて・あたらしい じから おまかせで えらんだよ！',null,shuffleArr(chosen));
+}
+
+/* =========================================================
+   クイックもんだい（4択×10問・くりかえしボーナス）
+   ---------------------------------------------------------
+   学年データから よみ/かんじあて/いみ/文の穴うめ を自動生成。
+   選択肢の重複と「別の正しい読みが誤答になる」問題を排除
+   （選択肢は {t, ok} オブジェクトで持ち、indexOfに頼らない）。
+   4択の正解は学習記録として weak・デイリー・XPに反映するが、
+   learnedKanji / mastery は書き取りドリル専用のまま。
+   ========================================================= */
+const QUICK_N = 10;
+const QUICK_KEY = 'kanji_quick_v1';
+const QUICK_LADDER = [0, 5, 8, 12, 16, 20]; // きょうn回目クリアのボーナスXP
+let quickData = { total: 0 };
+let quick = null;
+
+function loadQuick(){ try{ const p=JSON.parse(localStorage.getItem(QUICK_KEY)); if(p&&typeof p.total==='number') quickData=p; }catch(e){} }
+function saveQuick(){ try{ localStorage.setItem(QUICK_KEY,JSON.stringify(quickData)); }catch(e){} }
+function quickBonus(n){ return n<=5 ? QUICK_LADDER[n] : 5; } // 6回目からは+5
+
+function readingsOf(k){ const d=getKanjiData(k); return d&&d[0]?d[0].split('・'):[]; }
+
+// 誤答3つを選ぶ（正解・他の誤答とテキスト重複しない）。足りなければnull
+function pickQuickChoices(correctText, pool, toText){
+  const out=[];
+  for(const o of shuffleArr(pool)){
+    const t=toText(o);
+    if(t!==correctText && !out.includes(t)) out.push(t);
+    if(out.length===3) break;
+  }
+  if(out.length<3) return null;
+  return shuffleArr([{t:correctText,ok:true}, ...out.map(t=>({t,ok:false}))]);
+}
+
+// 1字ぶんの4択問題を作る（作れるタイプをランダムに試す）
+function buildQuickQ(k, allK){
+  const d=getKanjiData(k); if(!d) return null;
+  const my=readingsOf(k);
+  for(const type of shuffleArr(['yomi','kanji','imi','fill'])){
+    let q=null;
+    if(type==='yomi' && my.length){
+      // 誤答に この字の別の読みを出さない
+      const pool=allK.filter(o=>o!==k && readingsOf(o).length && !my.includes(readingsOf(o)[0]));
+      const ch=pickQuickChoices(my[0], pool, o=>readingsOf(o)[0]);
+      if(ch) q={type,k,choices:ch,html:`「<b class="qq-focus">${k}</b>」の よみかたは？`,
+        explain:`「${k}」は「${d[0]}」と よむよ`};
+    } else if(type==='kanji' && my.length){
+      const r=my[0];
+      // 同じ読みを持つ字は誤答にしない
+      const pool=allK.filter(o=>o!==k && !readingsOf(o).includes(r));
+      const ch=pickQuickChoices(k, pool, o=>o);
+      if(ch) q={type,k,choices:ch,html:`「<b class="qq-focus">${r}</b>」と よむ かんじは？`,
+        explain:`「${r}」は「${k}」（${d[1]}）`};
+    } else if(type==='imi'){
+      // 意味が同じ字は誤答にしない
+      const pool=allK.filter(o=>o!==k && (getKanjiData(o)||[])[1]!==d[1]);
+      const ch=pickQuickChoices(k, pool, o=>o);
+      if(ch) q={type,k,choices:ch,html:`「${d[1]}」<br>この いみの かんじは？`,
+        explain:`せいかいは「${k}」（${my[0]||''}）`};
+    } else if(type==='fill'){
+      const sent=ALL_QUESTIONS.find(x=>x.ans===k && x.q && x.q.includes('〔　〕'));
+      if(sent){
+        // 読みがかぶる字（同音で文に入り得る字）は誤答にしない
+        const pool=allK.filter(o=>o!==k && !readingsOf(o).some(r=>my.includes(r)));
+        const ch=pickQuickChoices(k, pool, o=>o);
+        if(ch) q={type,k,choices:ch,
+          html:`${sent.q.replace('〔　〕','<span class="qq-blank">◯</span>')}<br><span class="qq-sub">◯に はいる かんじは？</span>`,
+          explain:`せいかいは「${k}」：${sent.q.replace('〔　〕',k)}`};
+      }
+    }
+    if(q) return q;
+  }
+  return null;
+}
+
+// にがて → まだ正解していない字 → その他 の順で10問ぶんの字を選ぶ
+function buildQuickQuestions(){
+  const allK=getAllUniqueKanji().filter(k=>getKanjiData(k));
+  const weakSet=new Set(Object.keys(state.weak));
+  const order=[
+    ...shuffleArr(allK.filter(k=>weakSet.has(k))),
+    ...shuffleArr(allK.filter(k=>!weakSet.has(k)&&!state.learnedKanji.has(k))),
+    ...shuffleArr(allK.filter(k=>!weakSet.has(k)&&state.learnedKanji.has(k))),
+  ];
+  const qs=[];
+  for(const k of order){
+    if(qs.length>=QUICK_N) break;
+    const q=buildQuickQ(k,allK);
+    if(q) qs.push(q);
+  }
+  return qs;
+}
+
+function startQuickQuiz(){
+  const qs=buildQuickQuestions();
+  if(qs.length<4){ showToast('もんだいを つくれなかった…'); return; }
+  quick={ qs, idx:0, correctN:0 };
+  ensureQuickScreen();
+  renderQuickQ();
+  showScreen('quick');
+}
+
+function ensureQuickScreen(){
+  if(document.getElementById('screen-quick')) return;
+  const div=document.createElement('div');
+  div.id='screen-quick'; div.className='screen';
+  document.getElementById('app').appendChild(div);
+}
+
+function renderQuickQ(){
+  const q=quick.qs[quick.idx];
+  document.getElementById('screen-quick').innerHTML=`
+    <div class="quiz-header">
+      <button class="back-btn" onclick="goHome()">←</button>
+      <div>
+        <div class="quiz-title">⚡ クイックもんだい</div>
+        <div class="quiz-subtitle">タップで こたえよう！</div>
+      </div>
+      <div class="quiz-progress"><div class="qnum">${quick.idx+1} / ${quick.qs.length}</div></div>
+    </div>
+    <div class="prog-bar-wrap"><div class="prog-bar" style="width:${quick.idx/quick.qs.length*100}%"></div></div>
+    <div class="quick-card">
+      <div class="quick-q">${q.html}</div>
+      <div class="quick-choices">
+        ${q.choices.map((c,i)=>`<button class="quick-choice" onclick="answerQuick(${i})">${c.t}</button>`).join('')}
+      </div>
+      <div class="quick-explain" id="quickExplain"></div>
+    </div>`;
+  window.scrollTo(0,0);
+}
+
+function answerQuick(i){
+  const q=quick.qs[quick.idx];
+  if(q.done) return;
+  q.done=true;
+  const btns=document.querySelectorAll('.quick-choice');
+  btns.forEach(b=>b.disabled=true);
+  const ok=q.choices[i].ok;
+  btns[q.choices.findIndex(c=>c.ok)].classList.add('correct');
+  if(!ok) btns[i].classList.add('wrong');
+  const ex=document.getElementById('quickExplain');
+  ex.innerHTML=(ok?'<b class="qe-ok">⭕ せいかい！</b> ':'<b class="qe-ng">✕ ざんねん…</b> ')+q.explain;
+  ex.classList.add('show');
+  if(ok){
+    quick.correctN++; streak++;
+    sfx('correct',streak);
+    addXp(1);
+    if(state.weak[q.k]){
+      state.weak[q.k]--;
+      if(state.weak[q.k]<=0){ delete state.weak[q.k]; showToast(`🎓「${q.k}」を にがてから そつぎょう！`); }
+    }
+  } else {
+    streak=0;
+    sfx('wrong');
+    state.weak[q.k]=Math.min(9,(state.weak[q.k]||0)+1);
+  }
+  saveState();
+  bumpDaily(ok);
+  checkBadges();
+  setTimeout(()=>{
+    quick.idx++;
+    if(quick.idx>=quick.qs.length) finishQuick();
+    else renderQuickQ();
+  }, ok?900:1900);
+}
+
+function finishQuick(){
+  quickData.total++; saveQuick();
+  daily.quick=(daily.quick||0)+1; saveDaily();
+  const plays=daily.quick;
+  const bonus=quickBonus(plays);
+  const perfect=quick.correctN===quick.qs.length;
+  addXp(bonus+(perfect?10:0));
+  checkBadges();
+  if(perfect) dropConfetti(30);
+  else if(quick.correctN>=quick.qs.length*0.8) dropConfetti(12);
+  sfx(quick.correctN>=quick.qs.length*0.8?'fanfare':'cheer');
+  renderCatGrid();
+  document.getElementById('screen-quick').innerHTML=`
+    <div class="results-hero">
+      <div class="results-score">${quick.correctN} / ${quick.qs.length}</div>
+      <div class="results-msg">${perfect?'🎉 パーフェクト！':quick.correctN>=8?'🌟 すごい！':'👍 よくがんばった！'}</div>
+      <div class="quick-reward">
+        ⚡ きょう ${plays}回目クリア！ ボーナス <b>+${bonus}XP</b>${perfect?' ＋ パーフェクト <b>+10XP</b>':''}
+        <div class="quick-next">${plays<5?`つぎのクリアは ボーナス <b>+${quickBonus(plays+1)}XP</b>！もういちど やってみよう！`:'きょうは たくさん がんばったね！'}</div>
+      </div>
+    </div>
+    <div class="results-actions">
+      <button class="res-btn" onclick="goHome()">🏠 ホームへ</button>
+      <button class="res-btn primary" onclick="startQuickQuiz()">⚡ もういちど</button>
+    </div>`;
+  window.scrollTo(0,0);
 }
 
 // にがてとっくん：まちがえた字の問題だけで練習（1字1問・最大12問）

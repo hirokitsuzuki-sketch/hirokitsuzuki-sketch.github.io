@@ -244,3 +244,27 @@ canvas.writing-canvas{width:100%;height:120px;background:rgba(255,255,255,0.03);
 
 /* がくねんマスターへの道 */
 .head-stars{float:right;font-size:12px;font-weight:700;color:var(--gold)}
+
+/* クイックもんだい */
+.quick-entry{border-color:rgba(240,192,64,0.45);background:linear-gradient(135deg,rgba(240,192,64,0.10),var(--card))}
+.quick-entry:hover{border-color:var(--gold)}
+.quick-bonus-tag{color:var(--gold);font-weight:700}
+.quick-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px;box-shadow:var(--shadow);max-width:640px;margin:0 auto}
+.quick-q{font-size:20px;font-weight:700;color:var(--text3);line-height:1.9;margin-bottom:18px;text-align:center}
+.qq-focus{color:var(--accent);font-size:1.5em;font-family:'Noto Serif JP',serif}
+.qq-blank{display:inline-block;min-width:1.4em;text-align:center;color:var(--gold);border-bottom:3px solid var(--gold);font-weight:900}
+.qq-sub{font-size:13px;color:var(--text2)}
+.quick-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.quick-choice{padding:16px 10px;border-radius:12px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-family:inherit;font-size:20px;font-weight:700;cursor:pointer;transition:all 0.15s;-webkit-tap-highlight-color:transparent}
+.quick-choice:hover:not(:disabled){border-color:var(--accent);transform:translateY(-2px)}
+.quick-choice:disabled{cursor:default;opacity:0.75}
+.quick-choice.correct{background:rgba(62,207,142,0.18);border-color:var(--green);color:var(--green);opacity:1;animation:qc-pop 0.3s}
+.quick-choice.wrong{background:rgba(232,93,117,0.15);border-color:var(--accent3);color:var(--accent3);opacity:1}
+@keyframes qc-pop{50%{transform:scale(1.06)}}
+.quick-explain{margin-top:14px;font-size:14px;font-weight:600;color:var(--text2);text-align:center;min-height:22px;opacity:0;transition:opacity 0.25s;line-height:1.8}
+.quick-explain.show{opacity:1}
+.qe-ok{color:var(--green)}
+.qe-ng{color:var(--accent3)}
+.quick-reward{margin-top:18px;padding:14px 18px;background:rgba(240,192,64,0.10);border:1px solid rgba(240,192,64,0.35);border-radius:12px;font-size:14px;font-weight:700;color:var(--text3);display:inline-block}
+.quick-reward b{color:var(--gold)}
+.quick-next{margin-top:8px;font-size:12px;color:var(--text2);font-weight:600}
