@@ -56,7 +56,7 @@ const Screens = {
           `).join("")}
         </div>
 
-        <div class="section-h">🗺️ ステージをえらぼう</div>
+        <div class="section-h">🗺️ ステージをえらぼう <span class="stage-star-total">⭐ ${d.stats.stars} / ${STAGES.length * 3}${d.stats.stars >= STAGES.length * 3 ? " コンプリート！" : ""}</span></div>
         <div class="stage-list">
           ${STAGES.map(st => {
             const rec = d.stages[st.id];
@@ -196,7 +196,7 @@ const Screens = {
      かんじ図鑑
      ========================================= */
 
-  showZukan(tab) {
+  showZukan(tab, weakOnly = false) {
     // 初期タブは「もんだいの がくねん」設定に合わせる（ミックスは2年生）
     if (!tab) {
       const g = SaveMgr.data.settings.grade;
@@ -207,9 +207,11 @@ const Screens = {
 
     const entries = QDATA[tab].kanji;
     const z = SaveMgr.data.zukan;
+    const isWeak = e => { const r = z[e.k]; return r && r.c < r.s && r.c < 3; };
     const learned = entries.filter(e => z[e.k] && z[e.k].c >= 3).length;
     const seen = entries.filter(e => z[e.k] && z[e.k].s > 0).length;
-    const weakN = entries.filter(e => { const r = z[e.k]; return r && r.c < r.s && r.c < 3; }).length;
+    const weakN = entries.filter(isWeak).length;
+    const shown = weakOnly ? entries.filter(isWeak) : entries;
 
     layer.innerHTML = `
       <div class="modal-box">
@@ -217,17 +219,20 @@ const Screens = {
         <div class="zukan-tabs">
           ${["1", "2", "3", "4", "5", "6"].map(g => `<button class="zukan-tab ${g === tab ? "active" : ""}" data-tab="${g}">${g}年生</button>`).join("")}
         </div>
-        <div class="zukan-stat">であった ${seen} / マスター（3回せいかい） <span style="color:var(--gold)">${learned}</span>${weakN ? ` / にがて <span style="color:var(--red)">${weakN}</span>` : ""} / ぜんぶ ${entries.length}</div>
+        <div class="zukan-stat">であった ${seen} / マスター（3回せいかい） <span style="color:var(--gold)">${learned}</span>${weakN ? ` / にがて <span style="color:var(--red)">${weakN}</span>` : ""} / ぜんぶ ${entries.length}
+          ${weakN ? `<button class="zukan-weak-toggle ${weakOnly ? "active" : ""}" id="zukan-weak-btn">🩹 にがてだけ</button>` : ""}
+        </div>
         <div class="zukan-detail" id="zukan-detail">
           <div class="zm" style="padding-top:24px">かんじを タップすると くわしく みられるよ</div>
         </div>
         <div class="zukan-grid">
-          ${entries.map((e, i) => {
+          ${shown.map((e, i) => {
             const rec = z[e.k];
-            const weak = rec && rec.c < rec.s && rec.c < 3;
+            const weak = isWeak(e);
             const cls = rec && rec.c >= 3 ? "master" : rec && rec.s > 0 ? (weak ? "seen weak" : "seen") : "unseen";
             return `<button class="zukan-cell ${cls}" data-i="${i}">${e.k}</button>`;
           }).join("")}
+          ${shown.length === 0 ? '<div class="zm" style="grid-column:1/-1;padding:14px 0">にがてな かんじは ないよ！すごい！</div>' : ""}
         </div>
         <div class="modal-close-row">
           <button class="modal-btn" id="zukan-close">とじる</button>
@@ -236,11 +241,13 @@ const Screens = {
     `;
 
     layer.querySelectorAll(".zukan-tab").forEach(btn => {
-      btn.addEventListener("click", () => this.showZukan(btn.dataset.tab));
+      btn.addEventListener("click", () => this.showZukan(btn.dataset.tab, weakOnly));
     });
+    const weakBtn = document.getElementById("zukan-weak-btn");
+    if (weakBtn) weakBtn.addEventListener("click", () => this.showZukan(tab, !weakOnly));
     layer.querySelectorAll(".zukan-cell").forEach(btn => {
       btn.addEventListener("click", () => {
-        const e = entries[parseInt(btn.dataset.i, 10)];
+        const e = shown[parseInt(btn.dataset.i, 10)];
         const rec = z[e.k];
         document.getElementById("zukan-detail").innerHTML = `
           <div class="zk">${e.k}</div>

@@ -283,12 +283,14 @@ function renderDailyPanel() {
   }
   const n = Math.min(DAILY_GOAL, daily.solved);
   const L = xpLevel();
+  const nextTitle = TITLES.find(([l]) => l > L.lv);
   el.innerHTML = `
     <div class="dp-level" title="せいかいで XPがたまるよ！">
       <span class="dp-lv">Lv.${L.lv}</span>
       <div class="dp-level-info">
         <span class="dp-title">${titleFor(L.lv)}</span>
         <div class="dp-xp-wrap"><div class="dp-xp" style="width:${L.rest / L.need * 100}%"></div></div>
+        ${nextTitle ? `<span class="dp-next">つぎ: Lv.${nextTitle[0]} ${nextTitle[1]}</span>` : ''}
       </div>
     </div>
     <div class="dp-streak"><span class="dp-fire">🔥</span><b>${daily.streak || 0}</b><span class="dp-unit">日れんぞく</span></div>

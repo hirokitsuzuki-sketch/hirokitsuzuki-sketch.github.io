@@ -734,3 +734,10 @@ button:disabled { opacity: 0.45; cursor: default; }
 
 /* 図鑑：にがてマーク */
 .zukan-cell.weak{border-color:rgba(255,93,108,0.65);box-shadow:inset 0 0 0 1px rgba(255,93,108,0.3)}
+
+/* ステージ星の合計（スターコレクター実績への進捗） */
+.stage-star-total{float:right;font-size:0.72rem;font-weight:800;color:var(--gold)}
+
+/* 図鑑：にがてだけフィルター */
+.zukan-weak-toggle{margin-left:8px;padding:3px 10px;border-radius:999px;border:1px solid rgba(255,93,108,0.45);background:transparent;color:var(--red);font-family:inherit;font-size:0.68rem;font-weight:800;cursor:pointer;vertical-align:middle}
+.zukan-weak-toggle.active{background:rgba(255,93,108,0.18)}
