@@ -228,7 +228,8 @@ function renderDailyPanel() {
     <div class="dp-goal">
       <div class="dp-label">🎯 きょうのもくひょう <b>${daily.goalDone ? 'たっせい！✔' : n + ' / ' + DAILY_GOAL + '問'}</b></div>
       <div class="dp-bar-wrap"><div class="dp-bar${daily.goalDone ? ' done' : ''}" style="width:${n / DAILY_GOAL * 100}%"></div></div>
-    </div>`;
+    </div>
+    <button class="dp-ten" onclick="startDailyTen()">▶️ 10もん<span>スタート</span></button>`;
 }
 
 /* ---------- サウンドON/OFFボタン（ヘッダーに挿入） ---------- */
@@ -381,6 +382,25 @@ function beginQuizCustom(title, subtitle, catId, questions) {
   document.getElementById('qOf').textContent='全問';
   document.getElementById('progBar').style.width='0%';
   renderQuestions(); showScreen('quiz'); window.scrollTo(0,0);
+}
+
+// きょうの10もん：にがて → まだ正解していない字 → マスター未満の字 の順で自動編成
+function startDailyTen() {
+  const chosen=[]; const usedKanji=new Set();
+  const push=(q,review)=>{
+    if(chosen.length>=10||usedKanji.has(q.ans)) return;
+    usedKanji.add(q.ans);
+    chosen.push(review?Object.assign({},q,{review:true}):Object.assign({},q));
+  };
+  const weakSet=new Set(Object.keys(state.weak));
+  for(const q of shuffleArr(ALL_QUESTIONS.filter(q=>weakSet.has(q.ans)))) push(q,true);
+  if(chosen.length<10)
+    for(const q of shuffleArr(ALL_QUESTIONS.filter(q=>!state.learnedKanji.has(q.ans)))) push(q,false);
+  if(chosen.length<10)
+    for(const q of shuffleArr(ALL_QUESTIONS.filter(q=>(state.mastery[q.ans]||0)<3))) push(q,true);
+  if(chosen.length<10)
+    for(const q of shuffleArr(ALL_QUESTIONS)) push(q,true);
+  beginQuizCustom('▶️ きょうの10もん','にがて・あたらしい じから おまかせで えらんだよ！',null,shuffleArr(chosen));
 }
 
 // にがてとっくん：まちがえた字の問題だけで練習（1字1問・最大12問）
