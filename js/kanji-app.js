@@ -145,7 +145,17 @@ function switchTab(tab) {
 }
 
 function renderCatGrid() {
-  document.getElementById('catGrid').innerHTML = CATEGORIES.map(cat => {
+  // にがてとっくんカード（にがてな字がある時だけ先頭に表示）
+  const weakKanji=Object.keys(state.weak);
+  const weakCard=weakKanji.length?`
+    <div class="cat-card weak-card" onclick="startWeakQuiz()">
+      <div class="cat-header"><span class="cat-emoji">🩹</span>
+        <div><div class="cat-name">にがてとっくん</div><div class="cat-count">にがてな漢字 ${weakKanji.length}字</div></div>
+      </div>
+      <div class="weak-chips">${weakKanji.slice(0,10).map(k=>`<span>${k}</span>`).join('')}${weakKanji.length>10?'<span>…</span>':''}</div>
+      <div class="cat-score"><span>せいかいすると そつぎょうできるよ！</span></div>
+    </div>`:'';
+  document.getElementById('catGrid').innerHTML = weakCard + CATEGORIES.map(cat => {
     const sc=state.scores[cat.id]||{correct:0,total:0};
     const total=ALL_QUESTIONS.filter(q=>q.cat===cat.id).length;
     // 進捗バーは「正解したことのある漢字の数」基準（再挑戦しても下がらない）
@@ -186,22 +196,49 @@ function startQuiz(catId) {
 function retryWrong() {
   if(!state.lastWrong.length) return;
   const qs=state.lastWrong.map(q=>Object.assign({},q,{review:true}));
-  beginQuiz(state.currentCat, qs, true);
+  if(state.currentCat!==null) beginQuiz(state.currentCat, qs, true);
+  else beginQuizCustom(state.currentTitle.replace(' ・ふくしゅう','')+' ・ふくしゅう','まちがえた問題にリベンジ！',null,qs);
 }
 
 function beginQuiz(catId, questions, isReview) {
+  const cat=CATEGORIES[catId];
+  beginQuizCustom(
+    cat.emoji+' '+cat.name+(isReview?' ・ふくしゅう':''),
+    isReview?'まちがえた問題にリベンジ！':`${questions.length}問のチャレンジ`,
+    catId, questions);
+}
+
+function beginQuizCustom(title, subtitle, catId, questions) {
   state.currentCat=catId;
+  state.currentTitle=title;
   state.currentQuestions=questions;
   state.revealed=false; state.eraserMode={}; state.writingMode=0;
   state.wrongList=[];
   answeredCount=0; correctCount=0; streak=0;
-  const cat=CATEGORIES[catId];
-  document.getElementById('quizTitle').textContent=cat.emoji+' '+cat.name+(isReview?' ・ふくしゅう':'');
-  document.getElementById('quizSubtitle').textContent=isReview?'まちがえた問題にリベンジ！':`${questions.length}問のチャレンジ`;
+  document.getElementById('quizTitle').textContent=title;
+  document.getElementById('quizSubtitle').textContent=subtitle;
   document.getElementById('qNum').textContent=questions.length+'問';
   document.getElementById('qOf').textContent='全問';
   document.getElementById('progBar').style.width='0%';
   renderQuestions(); showScreen('quiz'); window.scrollTo(0,0);
+}
+
+// にがてとっくん：まちがえた字の問題だけで練習（1字1問・最大12問）
+function startWeakQuiz() {
+  const weakSet=new Set(Object.keys(state.weak));
+  if(weakSet.size===0) return;
+  const byKanji={};
+  for(const q of shuffleArr(ALL_QUESTIONS.filter(q=>weakSet.has(q.ans)))){
+    if(!byKanji[q.ans]) byKanji[q.ans]=q;
+  }
+  const qs=shuffleArr(Object.values(byKanji)).slice(0,12).map(q=>Object.assign({},q,{review:true}));
+  beginQuizCustom('🩹 にがてとっくん','にがてな漢字に せいかいして そつぎょうしよう！',null,qs);
+}
+
+function shuffleArr(arr){
+  const a=arr.slice();
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
 }
 
 function retryQuiz() { if(state.currentCat!==null) startQuiz(state.currentCat); }
@@ -316,14 +353,21 @@ function markAnswer(i,correct){
   badge.textContent=correct?'⭕':'✕'; badge.classList.add('show');
   check.style.opacity='0.4'; check.style.pointerEvents='none';
   answeredCount++;
+  const kanji=state.currentQuestions[i].ans;
   if(correct){
     correctCount++; streak++;
-    state.learnedKanji.add(state.currentQuestions[i].ans);
+    state.learnedKanji.add(kanji);
+    // にがてから1歩そつぎょう
+    if(state.weak[kanji]){
+      state.weak[kanji]--;
+      if(state.weak[kanji]<=0){ delete state.weak[kanji]; showToast(`🎓「${kanji}」を にがてから そつぎょう！`); }
+    }
     sfx('correct', streak);
     if(streak===3||streak===5||streak===10||streak===15) showToast(`🔥 ${streak}れんぞく せいかい！すごい！`);
   } else {
     streak=0;
     state.wrongList.push(state.currentQuestions[i]);
+    state.weak[kanji]=Math.min(9,(state.weak[kanji]||0)+1);
     sfx('wrong');
   }
   saveState(); // 途中でやめても記録が消えないように毎回保存
