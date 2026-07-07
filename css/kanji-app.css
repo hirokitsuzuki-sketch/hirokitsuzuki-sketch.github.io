@@ -198,3 +198,10 @@ canvas.writing-canvas{width:100%;height:120px;background:rgba(255,255,255,0.03);
 .weak-card:hover{border-color:var(--accent3)}
 .weak-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
 .weak-chips span{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;padding:0 4px;background:rgba(232,93,117,0.14);border:1px solid rgba(232,93,117,0.35);border-radius:8px;font-size:16px;font-weight:700;color:var(--text3)}
+
+/* 漢字マスター段階 */
+.kanji-chip{position:relative}
+.kanji-chip.master{border-color:var(--gold);background:linear-gradient(135deg,rgba(240,192,64,0.14),var(--card))}
+.kanji-chip.master .kanji-char{color:var(--gold)}
+.chip-star{position:absolute;top:2px;right:4px;font-size:10px}
+.modal-mastery{font-size:12px;font-weight:700;color:var(--gold);margin:6px 0 2px}

@@ -180,12 +180,18 @@ function renderCatGrid() {
 
 function renderKanjiGrid() {
   const all = getAllUniqueKanji();
+  const masterCount = all.filter(k=>(state.mastery[k]||0)>=3).length;
   document.getElementById('kanjiGrid').innerHTML = all.map(k => {
     const d=getKanjiData(k); const learned=state.learnedKanji.has(k);
-    return `<div class="kanji-chip ${learned?'learned':''}" onclick="showKanjiModal('${k}')">
+    const master=(state.mastery[k]||0)>=3;
+    return `<div class="kanji-chip ${master?'master':learned?'learned':''}" onclick="showKanjiModal('${k}')">
+      ${master?'<span class="chip-star">⭐</span>':''}
       <span class="kanji-char">${k}</span>
       <span class="kanji-read">${d?d[0].split('・')[0]:''}</span></div>`;
   }).join('');
+  // 一覧タブの見出しにマスター数を表示
+  const head=document.querySelector('#tab-list .section-head');
+  if(head) head.textContent=`習った漢字をチェック（⭐マスター ${masterCount} / ${all.length}字・3回せいかいでマスター）`;
 }
 
 function startQuiz(catId) {
@@ -357,6 +363,9 @@ function markAnswer(i,correct){
   if(correct){
     correctCount++; streak++;
     state.learnedKanji.add(kanji);
+    // マスター段階（3回せいかいで⭐マスター）
+    state.mastery[kanji]=Math.min(99,(state.mastery[kanji]||0)+1);
+    if(state.mastery[kanji]===3) showToast(`⭐「${kanji}」を マスターした！`);
     // にがてから1歩そつぎょう
     if(state.weak[kanji]){
       state.weak[kanji]--;
@@ -476,6 +485,18 @@ function showKanjiModal(kanji){
   document.getElementById('modalRead').textContent=d?d[0]:kanji;
   document.getElementById('modalMeaning').textContent=d?d[1]:'';
   document.getElementById('modalEx').textContent=d?d[2]:'';
+  // マスター進捗（せいかい回数）
+  let m=document.getElementById('modalMastery');
+  if(!m){
+    m=document.createElement('div');
+    m.id='modalMastery'; m.className='modal-mastery';
+    const read=document.getElementById('modalRead');
+    read.parentNode.insertBefore(m,read.nextSibling);
+  }
+  const c=state.mastery[kanji]||0;
+  m.textContent = c>=3?`⭐ マスター！（せいかい ${c}回）`
+    : c>0?`せいかい ${c}回 ・ あと${3-c}回で ⭐マスター`
+    : 'せいかいすると マスターに ちかづくよ';
   document.getElementById('modal').classList.add('show');
 }
 function closeModal(e){
