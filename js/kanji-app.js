@@ -12,7 +12,22 @@ window.addEventListener('DOMContentLoaded', () => {
   renderCatGrid(); renderKanjiGrid(); updateGlobalProgress();
   setupTimeTracking();
   if (typeof KSound !== 'undefined') { KSound.init(); setupSoundControls(); }
+  greetComeback();
 });
+
+// おかえりメッセージ（その日はじめての訪問時に1回だけ）
+function greetComeback(){
+  try{
+    if(sessionStorage.getItem('kanji_greeted')) return;
+    const isReturning = xpData.xp>0 || daily.lastDate;
+    if(!isReturning || daily.lastDate===dayKey(new Date())) return;
+    sessionStorage.setItem('kanji_greeted','1');
+    setTimeout(()=>{
+      const w=Object.keys(state.weak).length;
+      showToast(w>0?`おかえり！🩹 にがての ${w}字が まっているよ`:'おかえり！🎯 きょうも 10問 がんばろう！');
+    },800);
+  }catch(e){}
+}
 
 /* =========================================================
    勉強時間の記録（全学年共通・localStorage）
@@ -940,7 +955,24 @@ function showKanjiModal(kanji){
   m.textContent = c>=3?`⭐ マスター！（せいかい ${c}回）`
     : c>0?`せいかい ${c}回 ・ あと${3-c}回で ⭐マスター`
     : 'せいかいすると マスターに ちかづくよ';
+  // 「この字をれんしゅう」ボタン（気づき→練習の距離をゼロに）
+  let pb=document.getElementById('modalPractice');
+  if(!pb){
+    pb=document.createElement('button');
+    pb.id='modalPractice'; pb.className='modal-practice';
+    const closeBtn=document.querySelector('#modal .modal-close');
+    if(closeBtn) closeBtn.parentNode.insertBefore(pb,closeBtn);
+  }
+  pb.textContent=`✍️ 「${kanji}」を れんしゅうする`;
+  pb.onclick=()=>{ closeModal(); startKanjiPractice(kanji); };
   document.getElementById('modal').classList.add('show');
+}
+
+// その字の問題だけで集中練習
+function startKanjiPractice(k){
+  const qs=shuffleArr(ALL_QUESTIONS.filter(q=>q.ans===k)).map(q=>Object.assign({},q,{review:true}));
+  if(!qs.length){ showToast('この字の もんだいが みつからないよ…'); return; }
+  beginQuizCustom(`✍️ 「${k}」を れんしゅう`,'この字だけ しゅうちゅうとっくん！',null,qs);
 }
 function closeModal(e){
   if(!e||e.target.id==='modal'||e.target.classList.contains('modal-close'))

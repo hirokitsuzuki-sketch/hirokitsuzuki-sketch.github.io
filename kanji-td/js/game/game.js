@@ -69,6 +69,8 @@ const Game = {
     this.selectedTowerType = null;
     this.selectedTower = null;
     this.session = { kills: 0, correct: 0, wrong: 0, maxCombo: 0, coinsEarned: 0, towersBuilt: 0 };
+    Quiz.sessionWrong = [];
+    SaveMgr.touchStreak();
     FX.reset();
 
     // 経路をピクセルに変換
@@ -736,6 +738,10 @@ const Game = {
       maxCombo: s.maxCombo, coinsEarned: s.coinsEarned,
       lifeLeft: this.life, baseHp: this.stage.baseHp,
       newAch,
+      // きょう まちがえた かんじ（読みつき）
+      wrongKanji: Quiz.sessionWrong.map(k => ({
+        k, y: Quiz.kanjiMap[k] ? Quiz.kanjiMap[k].entry.y.join("・") : "",
+      })),
     });
   },
 

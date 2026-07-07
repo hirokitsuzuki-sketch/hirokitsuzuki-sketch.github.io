@@ -25,6 +25,8 @@ const SaveMgr = {
       ach: {},
       // デイリーチャレンジ
       daily: { date: "", stats: {}, done: false },
+      // れんぞくプレイ日数
+      playStreak: { days: 0, last: "" },
       settings: { grade: "2", sound: true, bgm: true, seenHowto: false },
     };
   },
@@ -128,6 +130,20 @@ const SaveMgr = {
     if (this.data.daily.date !== today) {
       this.data.daily = { date: today, stats: {}, done: false };
     }
+  },
+
+  /* ---------- れんぞくプレイ日数 ---------- */
+
+  // その日はじめてのプレイで連続日数を更新（前日プレイで+1、空くと1に戻る）
+  touchStreak() {
+    const s = this.data.playStreak || (this.data.playStreak = { days: 0, last: "" });
+    const today = this.todayKey();
+    if (s.last === today) return;
+    const y = new Date(Date.now() - 86400000);
+    const yesterday = y.getFullYear() + "-" + (y.getMonth() + 1) + "-" + y.getDate();
+    s.days = (s.last === yesterday) ? s.days + 1 : 1;
+    s.last = today;
+    this.save();
   },
 
   getDailyChallenge() {
