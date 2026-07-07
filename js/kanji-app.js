@@ -207,6 +207,8 @@ const BADGES = [
   { id:'all',     icon:'👑', name:'ぜんぶ おぼえた',  grade:true, cond:()=>learnedRatio()>=1 },
   { id:'t60',     icon:'⏱', name:'るいけい 1時間',  cond:()=>timeData&&timeData.total>=3600 },
   { id:'t300',    icon:'🕰️', name:'るいけい 5時間',  cond:()=>timeData&&timeData.total>=18000 },
+  { id:'s3all',   icon:'🌟', name:'ぜんカテゴリ ⭐3', grade:true, big:true,
+    cond:()=>CATEGORIES.every(c=>(state.catStars[c.id]||0)>=3) },
 ];
 
 function badgeId(b){ return b.grade ? b.id+':'+STORAGE_KEY : b.id; }
@@ -226,6 +228,7 @@ function checkBadges(){
     if(!badges[id] && b.cond()){
       badges[id]=true; newly++;
       setTimeout(()=>{ showToast(`🏆 バッジかくとく！「${b.name}」`); sfx('fanfare'); }, 1200*newly);
+      if(b.big) setTimeout(()=>{ dropConfetti(60); showToast('🌟 がくねんマスター たんじょう！おめでとう！！'); sfx('fanfare'); }, 1200*newly+1500);
     }
   }
   if(newly){ saveBadges(); renderBadgeRow(); }
@@ -356,6 +359,13 @@ function renderCatGrid() {
       <div class="weak-chips">${weakKanji.slice(0,10).map(k=>`<span>${k}</span>`).join('')}${weakKanji.length>10?'<span>…</span>':''}</div>
       <div class="cat-score"><span>せいかいすると そつぎょうできるよ！</span></div>
     </div>`:'';
+  // がくねんマスターへの道：⭐の合計をカテゴリ見出しに表示
+  const headEl=document.querySelector('#tab-quiz .section-head');
+  if(headEl){
+    const totalStars=CATEGORIES.reduce((s,c)=>s+(state.catStars[c.id]||0),0);
+    const maxStars=CATEGORIES.length*3;
+    headEl.innerHTML=`カテゴリを選ぼう <span class="head-stars">🌟 がくねんマスターへの道 ⭐ ${totalStars} / ${maxStars}</span>`;
+  }
   document.getElementById('catGrid').innerHTML = weakCard + CATEGORIES.map(cat => {
     const sc=state.scores[cat.id]||{correct:0,total:0};
     const total=ALL_QUESTIONS.filter(q=>q.cat===cat.id).length;
