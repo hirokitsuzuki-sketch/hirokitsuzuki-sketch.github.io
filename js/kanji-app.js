@@ -1,14 +1,81 @@
 let state = {
   currentCat: null, currentQuestions: [], revealed: false,
   scores: {}, learnedKanji: new Set(), writingMode: 0, eraserMode: {},
-  wrongList: [], lastWrong: []
+  wrongList: [], lastWrong: [], currentTitle: '',
+  catStars: {}, weak: {}, mastery: {}
 };
-let answeredCount = 0, correctCount = 0, streak = 0;
+let answeredCount = 0, correctCount = 0, streak = 0, lastPct = -1;
 
 window.addEventListener('DOMContentLoaded', () => {
-  loadState(); renderCatGrid(); renderKanjiGrid(); updateGlobalProgress();
+  loadState(); loadDaily();
+  renderDailyPanel(); renderCatGrid(); renderKanjiGrid(); updateGlobalProgress();
   if (typeof KSound !== 'undefined') { KSound.init(); setupSoundControls(); }
 });
+
+/* =========================================================
+   きょうのもくひょう＋れんぞく日数（全学年共通・localStorage）
+   ========================================================= */
+const DAILY_KEY = 'kanji_daily_v1';
+const DAILY_GOAL = 10; // 1日の目標問題数
+let daily = null;
+
+function dayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+
+function loadDaily() {
+  try { daily = JSON.parse(localStorage.getItem(DAILY_KEY)); } catch (e) { daily = null; }
+  if (!daily || typeof daily !== 'object') {
+    daily = { date: '', solved: 0, correct: 0, goalDone: false, streak: 0, lastDate: '' };
+  }
+  const today = dayKey(new Date());
+  if (daily.date !== today) {
+    daily.date = today; daily.solved = 0; daily.correct = 0; daily.goalDone = false;
+  }
+}
+
+function saveDaily() {
+  try { localStorage.setItem(DAILY_KEY, JSON.stringify(daily)); } catch (e) {}
+}
+
+// 1問採点するたびに呼ばれる
+function bumpDaily(correct) {
+  const today = dayKey(new Date());
+  if (daily.lastDate !== today) {
+    // きょう最初の1問 → れんぞく日数を判定
+    const yesterday = dayKey(new Date(Date.now() - 86400000));
+    daily.streak = (daily.lastDate === yesterday) ? (daily.streak || 0) + 1 : 1;
+    daily.lastDate = today;
+    if (daily.streak >= 2) setTimeout(() => showToast(`🔥 ${daily.streak}日 れんぞくで べんきょう中！えらい！`), 900);
+  }
+  daily.solved++;
+  if (correct) daily.correct++;
+  if (!daily.goalDone && daily.solved >= DAILY_GOAL) {
+    daily.goalDone = true;
+    setTimeout(() => { showToast('🎯 きょうの もくひょう たっせい！'); sfx('fanfare'); dropConfetti(24); }, 700);
+  }
+  saveDaily();
+  renderDailyPanel();
+}
+
+// ホーム上部の「きょうのもくひょう」パネル（HTMLは変更せずJSから挿入）
+function renderDailyPanel() {
+  let el = document.getElementById('dailyPanel');
+  if (!el) {
+    const home = document.getElementById('screen-home');
+    const anchor = home && home.querySelector('.tab-bar');
+    if (!anchor) return;
+    el = document.createElement('div');
+    el.id = 'dailyPanel';
+    el.className = 'daily-panel';
+    home.insertBefore(el, anchor);
+  }
+  const n = Math.min(DAILY_GOAL, daily.solved);
+  el.innerHTML = `
+    <div class="dp-streak"><span class="dp-fire">🔥</span><b>${daily.streak || 0}</b><span class="dp-unit">日れんぞく</span></div>
+    <div class="dp-goal">
+      <div class="dp-label">🎯 きょうのもくひょう <b>${daily.goalDone ? 'たっせい！✔' : n + ' / ' + DAILY_GOAL + '問'}</b></div>
+      <div class="dp-bar-wrap"><div class="dp-bar${daily.goalDone ? ' done' : ''}" style="width:${n / DAILY_GOAL * 100}%"></div></div>
+    </div>`;
+}
 
 /* ---------- サウンドON/OFFボタン（ヘッダーに挿入） ---------- */
 function setupSoundControls() {
@@ -242,7 +309,6 @@ function markAnswer(i,correct){
   if(correct){
     correctCount++; streak++;
     state.learnedKanji.add(state.currentQuestions[i].ans);
-    saveState(); // 途中でやめても「おぼえた漢字」は消さない
     sfx('correct', streak);
     if(streak===3||streak===5||streak===10||streak===15) showToast(`🔥 ${streak}れんぞく せいかい！すごい！`);
   } else {
@@ -250,6 +316,8 @@ function markAnswer(i,correct){
     state.wrongList.push(state.currentQuestions[i]);
     sfx('wrong');
   }
+  saveState(); // 途中でやめても記録が消えないように毎回保存
+  bumpDaily(correct);
   const pct=30+(answeredCount/state.currentQuestions.length)*70;
   document.getElementById('progBar').style.width=pct+'%';
   if(answeredCount===state.currentQuestions.length){
