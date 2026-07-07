@@ -7,8 +7,8 @@ let state = {
 let answeredCount = 0, correctCount = 0, streak = 0, lastPct = -1;
 
 window.addEventListener('DOMContentLoaded', () => {
-  loadState(); loadDaily();
-  renderDailyPanel(); renderCatGrid(); renderKanjiGrid(); updateGlobalProgress();
+  loadState(); loadDaily(); loadBadges();
+  renderDailyPanel(); renderBadgeRow(); renderCatGrid(); renderKanjiGrid(); updateGlobalProgress();
   if (typeof KSound !== 'undefined') { KSound.init(); setupSoundControls(); }
 });
 
@@ -54,6 +54,62 @@ function bumpDaily(correct) {
   }
   saveDaily();
   renderDailyPanel();
+}
+
+/* =========================================================
+   バッジ（獲得は全学年共通キー、字数系は学年別ID）
+   ========================================================= */
+const BADGE_KEY = 'kanji_badges_v1';
+let badges = {};
+
+const BADGES = [
+  { id:'goal1',   icon:'🎯', name:'はじめての もくひょう', cond:()=>daily.goalDone },
+  { id:'d3',      icon:'🔥', name:'3日 れんぞく',          cond:()=>daily.streak>=3 },
+  { id:'d7',      icon:'🏵️', name:'7日 れんぞく',          cond:()=>daily.streak>=7 },
+  { id:'perfect', icon:'💯', name:'全問 せいかい',          cond:()=>lastPct===100 },
+  { id:'hot10',   icon:'⚡', name:'10れんぞく せいかい',    cond:()=>streak>=10 },
+  { id:'m10',     icon:'⭐', name:'10字 マスター',   grade:true, cond:()=>masteredCount()>=10 },
+  { id:'half',    icon:'🌗', name:'はんぶん おぼえた', grade:true, cond:()=>learnedRatio()>=0.5 },
+  { id:'all',     icon:'👑', name:'ぜんぶ おぼえた',  grade:true, cond:()=>learnedRatio()>=1 },
+];
+
+function badgeId(b){ return b.grade ? b.id+':'+STORAGE_KEY : b.id; }
+function masteredCount(){ return getAllUniqueKanji().filter(k=>(state.mastery[k]||0)>=3).length; }
+function learnedRatio(){
+  const all=getAllUniqueKanji();
+  return all.length?all.filter(k=>state.learnedKanji.has(k)).length/all.length:0;
+}
+
+function loadBadges(){ try{ badges=JSON.parse(localStorage.getItem(BADGE_KEY))||{}; }catch(e){ badges={}; } }
+function saveBadges(){ try{ localStorage.setItem(BADGE_KEY,JSON.stringify(badges)); }catch(e){} }
+
+function checkBadges(){
+  let newly=0;
+  for(const b of BADGES){
+    const id=badgeId(b);
+    if(!badges[id] && b.cond()){
+      badges[id]=true; newly++;
+      setTimeout(()=>{ showToast(`🏆 バッジかくとく！「${b.name}」`); sfx('fanfare'); }, 1200*newly);
+    }
+  }
+  if(newly){ saveBadges(); renderBadgeRow(); }
+}
+
+// バッジ一覧（デイリーパネルの下）。未獲得は薄く見せて「次の目標」にする
+function renderBadgeRow(){
+  let el=document.getElementById('badgeRow');
+  if(!el){
+    const panel=document.getElementById('dailyPanel');
+    if(!panel) return;
+    el=document.createElement('div');
+    el.id='badgeRow'; el.className='badge-row';
+    panel.parentNode.insertBefore(el,panel.nextSibling);
+  }
+  el.innerHTML = BADGES.map(b=>{
+    const on=!!badges[badgeId(b)];
+    return `<span class="badge-chip ${on?'on':''}" title="${b.name}">
+      <span class="b-icon">${b.icon}</span><span class="b-name">${b.name}</span></span>`;
+  }).join('');
 }
 
 // ホーム上部の「きょうのもくひょう」パネル（HTMLは変更せずJSから挿入）
@@ -381,6 +437,7 @@ function markAnswer(i,correct){
   }
   saveState(); // 途中でやめても記録が消えないように毎回保存
   bumpDaily(correct);
+  checkBadges();
   const pct=30+(answeredCount/state.currentQuestions.length)*70;
   document.getElementById('progBar').style.width=pct+'%';
   if(answeredCount===state.currentQuestions.length){
@@ -399,6 +456,8 @@ function markAnswer(i,correct){
 
 function showResults(correct,total){
   const pct=Math.round(correct/total*100);
+  lastPct=pct;
+  checkBadges();
   document.getElementById('resScore').textContent=pct+'%';
   document.getElementById('resLabel').textContent=`${correct} / ${total} 問正解`;
   let msg,sub;

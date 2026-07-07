@@ -205,3 +205,9 @@ canvas.writing-canvas{width:100%;height:120px;background:rgba(255,255,255,0.03);
 .kanji-chip.master .kanji-char{color:var(--gold)}
 .chip-star{position:absolute;top:2px;right:4px;font-size:10px}
 .modal-mastery{font-size:12px;font-weight:700;color:var(--gold);margin:6px 0 2px}
+
+/* バッジ */
+.badge-row{display:flex;flex-wrap:wrap;gap:8px;margin:-6px 0 18px}
+.badge-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--card);font-size:11px;font-weight:700;color:var(--text2);opacity:0.38}
+.badge-chip.on{opacity:1;border-color:var(--gold);color:var(--text3);background:linear-gradient(135deg,rgba(240,192,64,0.12),var(--card))}
+.badge-chip .b-icon{font-size:14px}
