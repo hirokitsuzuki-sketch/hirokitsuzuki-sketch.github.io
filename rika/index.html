@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>りかラボ｜小学校の理科ドリル</title>
+<link rel="stylesheet" href="css/rika.css?v=20260707a">
+</head>
+<body>
+<div id="stars"></div>
+<div id="app">
+  <header>
+    <a class="logo" href="../index.html" title="かんじラボに戻る">
+      <div class="logo-icon">🔬</div>
+      <div>
+        <div class="logo-text">りかラボ</div>
+        <div class="logo-sub">小学3〜6年生の理科</div>
+      </div>
+    </a>
+    <div class="sound-controls">
+      <button class="sound-btn" id="btnBgm" title="BGMのON/OFF"></button>
+      <button class="sound-btn" id="btnSfx" title="こうかおんのON/OFF"></button>
+    </div>
+    <div class="progress-global">
+      <div class="pct" id="globalPct">0%</div>
+      <div class="lbl">マスター</div>
+    </div>
+  </header>
+
+  <!-- HOME -->
+  <div id="screen-home" class="screen active">
+    <div id="statusPanel" class="daily-panel"></div>
+    <div id="badgeRow" class="badge-row"></div>
+    <div id="timePanel" class="time-panel"></div>
+
+    <div class="grade-tabs" id="gradeTabs"></div>
+    <div class="section-head" id="unitHead">たんげんを えらぼう</div>
+    <div class="unit-grid" id="unitGrid"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="screen-quiz" class="screen">
+    <div class="quiz-header">
+      <button class="back-btn" onclick="goHome()">←</button>
+      <div>
+        <div class="quiz-title" id="quizTitle"></div>
+        <div class="quiz-subtitle" id="quizSubtitle"></div>
+      </div>
+      <div class="quiz-progress"><div class="qnum" id="qNum"></div></div>
+    </div>
+    <div class="prog-bar-wrap"><div class="prog-bar" id="progBar" style="width:0%"></div></div>
+    <div class="quick-card">
+      <div class="quick-q" id="quizQ"></div>
+      <div class="quick-choices" id="quizChoices"></div>
+      <div class="quick-explain" id="quizExplain"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="screen-result" class="screen">
+    <div class="results-hero">
+      <div class="results-score" id="resScore"></div>
+      <div class="res-stars" id="resStars"></div>
+      <div class="results-msg" id="resMsg"></div>
+      <div class="quick-reward" id="resReward"></div>
+    </div>
+    <div class="results-actions" id="resActions"></div>
+  </div>
+</div>
+
+<div class="site-nav">
+  <a href="../index.html">🏠 かんじラボ</a>
+  <a href="../grade3.html">✏️ かんじドリル</a>
+  <a href="../kanji-td/index.html">⚔️ かんじの塔</a>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/data-rika.js?v=20260707a"></script>
+<script src="../js/kanji-sound.js?v=20260707a"></script>
+<script src="js/rika-app.js?v=20260707a"></script>
+</body>
+</html>
