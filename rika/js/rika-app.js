@@ -266,9 +266,26 @@ function renderTimePanel() {
     </div>`;
 }
 
+/* ---------- きょうのまめちしき ---------- */
+function renderTrivia() {
+  const el = document.getElementById('triviaPanel');
+  if (!el || typeof RIKA_TRIVIA === 'undefined' || !RIKA_TRIVIA.length) { if (el) el.style.display = 'none'; return; }
+  const d = new Date();
+  // 日付から決定的に選ぶ（同じ日は同じネタ／日付が変われば次へ）
+  const dayIndex = Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
+  const tv = RIKA_TRIVIA[((dayIndex % RIKA_TRIVIA.length) + RIKA_TRIVIA.length) % RIKA_TRIVIA.length];
+  el.innerHTML = `
+    <div class="tv-emoji">${tv.e}</div>
+    <div class="tv-body">
+      <div class="tv-head">🔍 きょうの まめちしき</div>
+      <div class="tv-text">${tv.t}</div>
+    </div>`;
+}
+
 /* ---------- ホーム ---------- */
 function renderHome() {
   renderStatusPanel();
+  renderTrivia();
   renderBadgeRow();
   renderTimePanel();
   renderGradeTabs();
@@ -432,6 +449,7 @@ function beginQuiz(qs, title, subtitle, unitKey) {
   if (!qs.length) { showToast('もんだいが ないよ…'); return; }
   quiz = { qs, idx: 0, correctN: 0, unitKey, title, wrongKeys: [] };
   streak = 0;
+  updateCombo();
   document.getElementById('quizTitle').textContent = title;
   document.getElementById('quizSubtitle').textContent = subtitle;
   renderQuizQ();
@@ -449,6 +467,20 @@ function renderQuizQ() {
   const ex = document.getElementById('quizExplain');
   ex.innerHTML = ''; ex.classList.remove('show');
   window.scrollTo(0, 0);
+}
+
+// クイズ中の連続正解コンボ表示（2連続以上でON、正解でポップ、まちがいで消える）
+function updateCombo(pop) {
+  const el = document.getElementById('comboChip');
+  if (!el) return;
+  if (streak >= 2) {
+    el.textContent = `🔥 ${streak}れんぞく`;
+    el.classList.add('show');
+    if (pop) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+  } else {
+    el.classList.remove('show', 'pop');
+    el.textContent = '';
+  }
 }
 
 function answerQuiz(i) {
@@ -475,9 +507,11 @@ function answerQuiz(i) {
     }
     sfx('correct', streak);
     addXp(q.review ? 3 : 2);
+    updateCombo(true);
     if (streak === 3 || streak === 5 || streak === 10) showToast(`🔥 ${streak}れんぞく せいかい！すごい！`);
   } else {
     streak = 0;
+    updateCombo();
     r.w++;
     S.weak[q.key] = Math.min(9, (S.weak[q.key] || 0) + 1);
     quiz.wrongKeys.push(q.key);
@@ -519,6 +553,8 @@ function finishQuiz() {
   document.getElementById('resReward').innerHTML =
     `かくとくXP <b>+${quiz.correctN * 2 + 5 + (perfect ? 10 : 0)}</b>${perfect ? '（パーフェクトボーナス +10 こみ！）' : ''}`;
 
+  renderResultReview();
+
   const wrongN = quiz.wrongKeys.length;
   document.getElementById('resActions').innerHTML = `
     ${wrongN ? `<button class="res-btn wrong-retry" onclick="retryWrong()">✍️ まちがえた${wrongN}問を やりなおす</button>` : ''}
@@ -530,6 +566,29 @@ function finishQuiz() {
   else sfx('cheer');
 
   showScreen('result');
+}
+
+// リザルトの「まちがえた問題」ふりかえり（問題文＋正解＋解説）
+function renderResultReview() {
+  const el = document.getElementById('resReview');
+  if (!el) return;
+  const keys = [...new Set(quiz.wrongKeys)];
+  if (!keys.length) {
+    el.innerHTML = '<div class="rr-allok">✨ ぜんもん せいかい！この調子だよ</div>';
+    return;
+  }
+  const items = keys.map(k => {
+    const q = qByKey(k);
+    if (!q) return '';
+    return `<li class="rr-item">
+      <div class="rr-q">${q.q}</div>
+      <div class="rr-a">⭕ こたえ： <b>${q.c}</b></div>
+      <div class="rr-ex">${q.ex}</div>
+    </li>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="rr-head">📖 まちがえた ${keys.length}問を もういちど かくにん</div>
+    <ul class="rr-list">${items}</ul>`;
 }
 
 function retryWrong() {

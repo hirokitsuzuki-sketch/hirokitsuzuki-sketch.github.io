@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>りかラボ｜小学校の理科ドリル</title>
-<link rel="stylesheet" href="css/rika.css?v=20260707a">
+<link rel="stylesheet" href="css/rika.css?v=20260708a">
 </head>
 <body>
 <div id="stars"></div>
@@ -30,6 +30,7 @@
   <!-- HOME -->
   <div id="screen-home" class="screen active">
     <div id="statusPanel" class="daily-panel"></div>
+    <div id="triviaPanel" class="trivia-panel"></div>
     <div id="badgeRow" class="badge-row"></div>
     <div id="timePanel" class="time-panel"></div>
 
@@ -46,7 +47,10 @@
         <div class="quiz-title" id="quizTitle"></div>
         <div class="quiz-subtitle" id="quizSubtitle"></div>
       </div>
-      <div class="quiz-progress"><div class="qnum" id="qNum"></div></div>
+      <div class="quiz-progress">
+        <div class="qnum" id="qNum"></div>
+        <div class="combo-chip" id="comboChip"></div>
+      </div>
     </div>
     <div class="prog-bar-wrap"><div class="prog-bar" id="progBar" style="width:0%"></div></div>
     <div class="quick-card">
@@ -64,6 +68,7 @@
       <div class="results-msg" id="resMsg"></div>
       <div class="quick-reward" id="resReward"></div>
     </div>
+    <div class="result-review" id="resReview"></div>
     <div class="results-actions" id="resActions"></div>
   </div>
 </div>
@@ -76,8 +81,8 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="js/data-rika.js?v=20260707a"></script>
-<script src="../js/kanji-sound.js?v=20260707a"></script>
-<script src="js/rika-app.js?v=20260707a"></script>
+<script src="js/data-rika.js?v=20260708a"></script>
+<script src="../js/kanji-sound.js?v=20260708a"></script>
+<script src="js/rika-app.js?v=20260708a"></script>
 </body>
 </html>
