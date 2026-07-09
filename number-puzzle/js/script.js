@@ -44,11 +44,26 @@ function applyOp(a, op, b) {
   }
 }
 
-/** [a,b,c] を [op1,op2] で左から順に評価する。負数・非整数・割り切れない場合は null */
+const OP_PRECEDENCE = { "×": 2, "÷": 2, "+": 1, "-": 1 };
+
+/**
+ * [a,b,c] を [op1,op2] で四則演算の優先順位(×÷が先)に従って評価する。
+ * 途中計算も含め、負数・非整数・割り切れない場合は null。
+ * 例: 1+7÷2 は 7÷2 を先に計算するため割り切れず null(このような
+ * 「左から順に計算しないと成立しない式」は問題として採用されない)。
+ */
 function evalChain(nums, ops) {
-  const mid = applyOp(nums[0], ops[0], nums[1]);
-  if (mid === null || mid < 0 || !Number.isInteger(mid)) return null;
-  const result = applyOp(mid, ops[1], nums[2]);
+  let result;
+  if (OP_PRECEDENCE[ops[1]] > OP_PRECEDENCE[ops[0]]) {
+    // 例: a + b × c → b×c を先に計算
+    const right = applyOp(nums[1], ops[1], nums[2]);
+    if (right === null || right < 0 || !Number.isInteger(right)) return null;
+    result = applyOp(nums[0], ops[0], right);
+  } else {
+    const left = applyOp(nums[0], ops[0], nums[1]);
+    if (left === null || left < 0 || !Number.isInteger(left)) return null;
+    result = applyOp(left, ops[1], nums[2]);
+  }
   if (result === null || result < 0 || !Number.isInteger(result)) return null;
   return result;
 }
