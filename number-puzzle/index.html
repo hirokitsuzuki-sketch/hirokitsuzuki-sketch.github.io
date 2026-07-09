@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>算数クロスワード</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="stars"></div>
+  <div id="app">
+    <header>
+      <span class="logo-icon">🧮</span>
+      <h1>算数クロスワード</h1>
+      <p>タテ・ヨコが正しい式になるように、空いているマスに数字を入れよう</p>
+    </header>
+
+    <section class="panel">
+      <div class="difficulty-row">
+        <button class="diff-btn" data-diff="easy">かんたん</button>
+        <button class="diff-btn active" data-diff="normal">ふつう</button>
+        <button class="diff-btn" data-diff="hard">むずかしい</button>
+      </div>
+
+      <div id="grid" class="grid"></div>
+
+      <div id="message" class="message"></div>
+
+      <div class="controls">
+        <button id="hint" class="btn btn-ghost">ヒント</button>
+        <button id="check" class="btn btn-primary">こたえ合わせ</button>
+        <button id="new-puzzle" class="btn btn-ghost">もんだいを かえる</button>
+      </div>
+
+      <div class="stats">
+        <span>タイム: <strong id="time">00:00</strong></span>
+        <span>クリア数: <strong id="solved-count">0</strong></span>
+      </div>
+    </section>
+
+    <footer>
+      <a href="../index.html">← かんじラボ トップへ</a>
+    </footer>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
