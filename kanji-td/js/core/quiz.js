@@ -60,9 +60,11 @@ const Quiz = {
     return null;
   },
 
-  // 設定から出題学年のプールを決める
+  // 設定から出題学年のプールを決める。
+  // 1年生は簡単すぎるため出題対象から常に除外する（データ・図鑑には残す）。
+  // "1" は旧バージョンで保存された設定の互換用（ミックス扱いに読み替え）。
   gradePool(grade) {
-    if (grade === "mix") return Object.keys(QDATA);
+    if (grade === "mix" || grade === "1") return Object.keys(QDATA).filter(g => g !== "1");
     return [grade];
   },
 
@@ -99,8 +101,8 @@ const Quiz = {
       const q = this.build(type, grade);
       if (q) return q;
     }
-    // 保険：読み問題ならほぼ確実に作れる。万一 null なら全学年から探す
-    for (const g of this.shuffle(this.gradePool(gradeSetting).concat(Object.keys(QDATA)))) {
+    // 保険：読み問題ならほぼ確実に作れる。万一 null なら全学年（1年生を除く）から探す
+    for (const g of this.shuffle(this.gradePool(gradeSetting).concat(Object.keys(QDATA).filter(g => g !== "1")))) {
       const q = this.build("yomi", g);
       if (q) return q;
     }

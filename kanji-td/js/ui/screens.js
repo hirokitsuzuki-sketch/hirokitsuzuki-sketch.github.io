@@ -49,7 +49,7 @@ const Screens = {
 
         <div class="section-h">📚 もんだいの がくねん</div>
         <div class="grade-select">
-          ${["1", "2", "3", "4", "5", "6", "mix"].map(g => `
+          ${["2", "3", "4", "5", "6", "mix"].map(g => `
             <button class="grade-chip ${d.settings.grade === g ? "active" : ""}" data-grade="${g}">
               ${g === "mix" ? "🌈 ミックス" : g + "年生"}
             </button>
