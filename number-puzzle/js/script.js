@@ -178,6 +178,7 @@ const state = {
   startedAt: 0,
   timerId: null,
   solvedCount: 0,
+  cleared: false, // このパズルをクリア済みか(こたえ合わせ連打での多重カウント防止)
 };
 
 const gridEl = document.getElementById("grid");
@@ -312,11 +313,13 @@ function newPuzzle() {
   }
   state.solved = puzzle.solved;
   state.blanks = puzzle.blanks;
+  state.cleared = false;
   renderGrid();
   startTimer();
 }
 
 function checkAnswers() {
+  if (state.cleared) return;
   const inputs = gridEl.querySelectorAll(".cell-input");
   let allFilled = true;
   let allCorrect = true;
@@ -341,6 +344,8 @@ function checkAnswers() {
   }
   if (allCorrect) {
     stopTimer();
+    state.cleared = true;
+    inputs.forEach((input) => { input.disabled = true; });
     state.solvedCount++;
     solvedCountEl.textContent = String(state.solvedCount);
     messageEl.textContent = `せいかい！ ${timeEl.textContent} でクリア`;
