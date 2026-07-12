@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>柊くんの じゆうノート｜かんじラボ</title>
+<link rel="stylesheet" href="css/theme.css?v=20260710a">
+<script src="js/theme.js?v=20260710a"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Noto+Serif+JP:wght@700&display=swap');
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #161923;
+    --card: #1a2035;
+    --accent: #4f9eff;
+    --text: #e8eaf6;
+    --text2: #8892b0;
+    --border: rgba(79,158,255,0.15);
+    --r: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    overscroll-behavior: none;
+  }
+  body {
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  header a.logo {
+    display: flex; align-items: center; gap: 8px;
+    text-decoration: none; color: inherit;
+  }
+  header .logo-icon { font-size: 1.5rem; }
+  header h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+  header .sub { font-size: 0.72rem; color: var(--text2); }
+  header .spacer { flex: 1; }
+
+  /* ---------- ツールバー ---------- */
+  #toolbar {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .tool-group { display: flex; align-items: center; gap: 6px; }
+  .tool-sep { width: 1px; height: 26px; background: var(--border); }
+
+  .swatch {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+    cursor: pointer; padding: 0;
+    transition: transform 0.12s;
+  }
+  .swatch.active { border-color: #fff; transform: scale(1.18); }
+
+  .size-btn {
+    width: 34px; height: 34px; border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg2); color: var(--text);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .size-btn .dot { border-radius: 50%; background: currentColor; }
+  .size-btn.active { border-color: var(--accent); background: rgba(79,158,255,0.15); }
+
+  .tool-btn {
+    height: 34px; padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg2); color: var(--text);
+    font-family: inherit; font-size: 0.82rem; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+  }
+  .tool-btn:active { transform: scale(0.95); }
+  .tool-btn.active { border-color: var(--accent); background: rgba(79,158,255,0.2); color: #fff; }
+  .tool-btn:disabled { opacity: 0.35; cursor: default; }
+
+  #pageInfo { font-size: 0.8rem; color: var(--text2); font-weight: 700; min-width: 44px; text-align: center; }
+
+  /* ---------- キャンバス ---------- */
+  #canvasArea {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: 10px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  #noteFrame {
+    position: relative;
+    width: 100%; height: 100%;
+    max-width: 900px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    touch-action: none;
+    overflow: hidden;
+  }
+  #noteCanvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    cursor: crosshair;
+  }
+
+  /* ---------- 確認ダイアログ ---------- */
+  #confirmBox {
+    position: fixed; inset: 0;
+    background: rgba(6,8,14,0.85);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 50;
+  }
+  #confirmBox.hidden { display: none; }
+  .confirm-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--r); padding: 26px 28px; text-align: center; max-width: 300px;
+  }
+  .confirm-card p { margin-bottom: 18px; font-size: 0.95rem; }
+  .confirm-buttons { display: flex; gap: 10px; justify-content: center; }
+  .confirm-buttons button {
+    font-family: inherit; font-size: 0.88rem; font-weight: 700;
+    padding: 9px 18px; border-radius: 10px; border: none; cursor: pointer;
+  }
+  #confirmYes { background: linear-gradient(135deg,#ef6461,#c94a4a); color: #fff; }
+  #confirmNo { background: var(--bg2); color: var(--text); border: 1px solid var(--border) !important; }
+
+  /* ---------- トースト ---------- */
+  #toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+    background: rgba(20,24,36,0.95); color: var(--text);
+    padding: 10px 20px; border-radius: 999px; font-size: 0.85rem; font-weight: 700;
+    border: 1px solid var(--border);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 60;
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 560px) {
+    header h1 { font-size: 0.9rem; }
+    header .sub { display: none; }
+    .tool-btn { padding: 0 8px; font-size: 0.72rem; }
+    .tool-btn span.label { display: none; }
+    .swatch { width: 22px; height: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html" title="かんじラボに戻る">
+    <span class="logo-icon">🎓</span>
+    <div>
+      <h1>じゆうノート</h1>
+      <div class="sub">柊くんの かんじラボ</div>
+    </div>
+  </a>
+  <div class="spacer"></div>
+</header>
+
+<div id="toolbar">
+  <div class="tool-group" id="colorGroup"></div>
+
+  <div class="tool-sep"></div>
+
+  <div class="tool-group">
+    <button class="size-btn" data-size="4" title="ほそい"><span class="dot" style="width:5px;height:5px"></span></button>
+    <button class="size-btn" data-size="10" title="ふつう"><span class="dot" style="width:10px;height:10px"></span></button>
+    <button class="size-btn" data-size="22" title="ふとい"><span class="dot" style="width:16px;height:16px"></span></button>
+  </div>
+
+  <div class="tool-sep"></div>
+
+  <div class="tool-group">
+    <button class="tool-btn" id="eraserBtn" title="けしごむ">🧹 <span class="label">けしごむ</span></button>
+    <button class="tool-btn" id="undoBtn" title="ひとつもどす">↩️ <span class="label">もどす</span></button>
+  </div>
+
+  <div class="tool-sep"></div>
+
+  <div class="tool-group">
+    <button class="tool-btn" id="prevPageBtn" title="まえのページ">◀</button>
+    <span id="pageInfo">1 / 1</span>
+    <button class="tool-btn" id="nextPageBtn" title="つぎのページ">▶</button>
+    <button class="tool-btn" id="addPageBtn" title="あたらしいページ">➕ <span class="label">ページ</span></button>
+  </div>
+
+  <div class="tool-sep"></div>
+
+  <div class="tool-group">
+    <button class="tool-btn" id="clearBtn" title="このページをぜんぶ消す">🗑️ <span class="label">消す</span></button>
+    <button class="tool-btn" id="saveBtn" title="がぞうとしてほぞん">💾 <span class="label">ほぞん</span></button>
+  </div>
+</div>
+
+<div id="canvasArea">
+  <div id="noteFrame">
+    <canvas id="noteCanvas"></canvas>
+  </div>
+</div>
+
+<div id="confirmBox" class="hidden">
+  <div class="confirm-card">
+    <p id="confirmText">このページを ぜんぶ消しますか？</p>
+    <div class="confirm-buttons">
+      <button id="confirmYes">けす</button>
+      <button id="confirmNo">やめる</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "kanjilab_note_v1";
+  var COLORS = ["#1a1a2e", "#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6", "#8b5cf6", "#ec4899"];
+  var MAX_UNDO = 20;
+
+  var frame = document.getElementById("noteFrame");
+  var canvas = document.getElementById("noteCanvas");
+  var ctx = canvas.getContext("2d");
+
+  var state = { pages: [null], current: 0 }; // pages[i] は dataURL(空ページはnull)
+  var color = COLORS[0];
+  var size = 10;
+  var eraser = false;
+  var undoStack = [];
+  var drawing = false;
+  var lastPt = null;
+
+  /* ---------- 保存・読み込み ---------- */
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.pages) && parsed.pages.length > 0) {
+          state.pages = parsed.pages;
+          state.current = Math.min(parsed.current || 0, parsed.pages.length - 1);
+        }
+      }
+    } catch (e) {}
+  }
+  var saveTimer = null;
+  function persist() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }, 300);
+  }
+
+  /* ---------- キャンバスのサイズ調整(内容を保ったまま) ---------- */
+  function resizeCanvas(keepContent) {
+    var prevData = keepContent ? canvas.toDataURL("image/png") : null;
+    var dpr = window.devicePixelRatio || 1;
+    var rect = frame.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, rect.width, rect.height);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    if (prevData) {
+      var img = new Image();
+      img.onload = function () {
+        ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      };
+      img.src = prevData;
+    }
+  }
+
+  /* ---------- ページ表示 ---------- */
+  function renderPage() {
+    var rect = frame.getBoundingClientRect();
+    ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, rect.width, rect.height);
+    var data = state.pages[state.current];
+    if (data) {
+      var img = new Image();
+      img.onload = function () { ctx.drawImage(img, 0, 0, rect.width, rect.height); };
+      img.src = data;
+    }
+    document.getElementById("pageInfo").textContent = (state.current + 1) + " / " + state.pages.length;
+    document.getElementById("prevPageBtn").disabled = state.current === 0;
+    document.getElementById("nextPageBtn").disabled = state.current === state.pages.length - 1;
+    undoStack = [];
+  }
+
+  function saveCurrentPage() {
+    state.pages[state.current] = canvas.toDataURL("image/png");
+    persist();
+  }
+
+  /* ---------- 描画 ---------- */
+  function getPos(e) {
+    var r = canvas.getBoundingClientRect();
+    var src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - r.left, y: src.clientY - r.top };
+  }
+  function pushUndo() {
+    undoStack.push(canvas.toDataURL("image/png"));
+    if (undoStack.length > MAX_UNDO) undoStack.shift();
+  }
+  function startDraw(e) {
+    e.preventDefault();
+    pushUndo();
+    drawing = true;
+    lastPt = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastPt.x, lastPt.y);
+  }
+  function draw(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    var p = getPos(e);
+    ctx.globalCompositeOperation = eraser ? "destination-out" : "source-over";
+    ctx.strokeStyle = color;
+    ctx.lineWidth = eraser ? size * 2.2 : size;
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    lastPt = p;
+  }
+  function endDraw(e) {
+    if (!drawing) return;
+    if (e) e.preventDefault();
+    drawing = false;
+    ctx.globalCompositeOperation = "source-over";
+    saveCurrentPage();
+  }
+
+  canvas.addEventListener("mousedown", startDraw);
+  canvas.addEventListener("mousemove", draw);
+  window.addEventListener("mouseup", endDraw);
+  canvas.addEventListener("touchstart", startDraw, { passive: false });
+  canvas.addEventListener("touchmove", draw, { passive: false });
+  canvas.addEventListener("touchend", endDraw, { passive: false });
+  canvas.addEventListener("touchcancel", endDraw, { passive: false });
+
+  /* ---------- ツールバー ---------- */
+  var colorGroup = document.getElementById("colorGroup");
+  COLORS.forEach(function (c, i) {
+    var b = document.createElement("button");
+    b.className = "swatch" + (i === 0 ? " active" : "");
+    b.style.background = c;
+    b.title = "いろ";
+    b.addEventListener("click", function () {
+      color = c;
+      eraser = false;
+      document.getElementById("eraserBtn").classList.remove("active");
+      Array.prototype.forEach.call(colorGroup.children, function (el) { el.classList.remove("active"); });
+      b.classList.add("active");
+    });
+    colorGroup.appendChild(b);
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll(".size-btn"), function (b, i) {
+    if (i === 1) b.classList.add("active");
+    b.addEventListener("click", function () {
+      size = Number(b.dataset.size);
+      Array.prototype.forEach.call(document.querySelectorAll(".size-btn"), function (x) { x.classList.remove("active"); });
+      b.classList.add("active");
+    });
+  });
+
+  document.getElementById("eraserBtn").addEventListener("click", function () {
+    eraser = !eraser;
+    this.classList.toggle("active", eraser);
+  });
+
+  document.getElementById("undoBtn").addEventListener("click", function () {
+    if (undoStack.length === 0) return;
+    var data = undoStack.pop();
+    var rect = frame.getBoundingClientRect();
+    var img = new Image();
+    img.onload = function () {
+      ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      ctx.drawImage(img, 0, 0, rect.width, rect.height);
+      saveCurrentPage();
+    };
+    img.src = data;
+  });
+
+  document.getElementById("addPageBtn").addEventListener("click", function () {
+    saveCurrentPage();
+    state.pages.splice(state.current + 1, 0, null);
+    state.current += 1;
+    persist();
+    renderPage();
+    showToast("あたらしいページを つくったよ");
+  });
+  document.getElementById("prevPageBtn").addEventListener("click", function () {
+    if (state.current === 0) return;
+    saveCurrentPage();
+    state.current -= 1;
+    renderPage();
+  });
+  document.getElementById("nextPageBtn").addEventListener("click", function () {
+    if (state.current === state.pages.length - 1) return;
+    saveCurrentPage();
+    state.current += 1;
+    renderPage();
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", function () {
+    showConfirm("このページを ぜんぶ消しますか？", function () {
+      var rect = frame.getBoundingClientRect();
+      ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      saveCurrentPage();
+      undoStack = [];
+      showToast("けしたよ");
+    });
+  });
+
+  document.getElementById("saveBtn").addEventListener("click", function () {
+    var link = document.createElement("a");
+    link.download = "note-page" + (state.current + 1) + ".png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    showToast("がぞうを ほぞんしたよ");
+  });
+
+  /* ---------- 確認ダイアログ ---------- */
+  var confirmBox = document.getElementById("confirmBox");
+  var confirmCallback = null;
+  function showConfirm(text, cb) {
+    document.getElementById("confirmText").textContent = text;
+    confirmCallback = cb;
+    confirmBox.classList.remove("hidden");
+  }
+  document.getElementById("confirmYes").addEventListener("click", function () {
+    confirmBox.classList.add("hidden");
+    if (confirmCallback) confirmCallback();
+    confirmCallback = null;
+  });
+  document.getElementById("confirmNo").addEventListener("click", function () {
+    confirmBox.classList.add("hidden");
+    confirmCallback = null;
+  });
+
+  /* ---------- トースト ---------- */
+  var toastTimer = null;
+  function showToast(msg) {
+    var el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 1600);
+  }
+
+  /* ---------- 初期化 ---------- */
+  load();
+  resizeCanvas(false);
+  renderPage();
+
+  var resizeTimer = null;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () { resizeCanvas(true); }, 150);
+  });
+
+  // ページ離脱前に確実に保存
+  window.addEventListener("pagehide", function () {
+    state.pages[state.current] = canvas.toDataURL("image/png");
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>
